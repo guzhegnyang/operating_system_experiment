@@ -1,4 +1,5 @@
 #include "command.h"
+#include <stdlib.h>
 unsigned char ramFDD144[1474560];
 unsigned char cur = ROOT;
 char command[10];
@@ -20,6 +21,10 @@ int main()
         read_command(command, parameter);
         if (is_command(command, "EXIT")) {
         	break;
+        }
+        if (is_command(command, "CLS")) {
+        	system("cls");
+        	continue;
         }
         //puts(command);
         //puts(parameter);
