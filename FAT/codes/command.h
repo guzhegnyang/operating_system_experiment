@@ -16,7 +16,12 @@ void read_command(char command[], char parameter[])
             parameter[0] = '\0';
             return;
         }
-        command[i] = ch;
+        if (ch >= 'a' && ch <= 'z') {
+        	command[i] = ch - 'a' + 'A';
+        }
+        else {
+        	command[i] = ch;
+        }
         ch = getchar();
     }
     command[i] = '\0';
@@ -30,20 +35,15 @@ void read_command(char command[], char parameter[])
             while ((ch = getchar()) == ' ')
                 ;
         }
-        parameter[i] = ch;
+        if (ch >= 'a' && ch <= 'z') {
+        	parameter[i] = ch - 'a' + 'A';
+        }
+        else {
+        	parameter[i] = ch;
+        }
         ch = getchar();
     }
     parameter[i] = '\0';
-}
-void upper(char str[])
-{
-    for (int i = 0; str[i]; i++)
-    {
-        if (str[i] >= 'a' && str[i] <= 'z')
-        {
-            str[i] = str[i] - 'a' + 'A';
-        }
-    }
 }
 int is_command(const char command1[], const char command2[])
 {
@@ -75,10 +75,14 @@ char *split(char path[])
 void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
                      unsigned char mbr[], struct FatItem fat1[], struct FatItem fat2[], struct RootEntry space[], unsigned char data[])
 {
-    upper(command);
-    upper(parameter);
     if (is_command(command, "CHECK"))
     {
+    	if (check(mbr)) {
+    		puts("Legal");
+    	}
+    	else {
+    		puts("Illegal");
+    	}
     }
     else if (is_command(command, "DIR"))
     {
