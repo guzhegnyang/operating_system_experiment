@@ -16,11 +16,13 @@ void read_command(char command[], char parameter[])
             parameter[0] = '\0';
             return;
         }
-        if (ch >= 'a' && ch <= 'z') {
-        	command[i] = ch - 'a' + 'A';
+        if (ch >= 'a' && ch <= 'z')
+        {
+            command[i] = ch - 'a' + 'A';
         }
-        else {
-        	command[i] = ch;
+        else
+        {
+            command[i] = ch;
         }
         ch = getchar();
     }
@@ -35,11 +37,13 @@ void read_command(char command[], char parameter[])
             while ((ch = getchar()) == ' ')
                 ;
         }
-        if (ch >= 'a' && ch <= 'z') {
-        	parameter[i] = ch - 'a' + 'A';
+        if (ch >= 'a' && ch <= 'z')
+        {
+            parameter[i] = ch - 'a' + 'A';
         }
-        else {
-        	parameter[i] = ch;
+        else
+        {
+            parameter[i] = ch;
         }
         ch = getchar();
     }
@@ -77,12 +81,14 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
 {
     if (is_command(command, "CHECK"))
     {
-    	if (check(mbr)) {
-    		puts("Legal");
-    	}
-    	else {
-    		puts("Illegal");
-    	}
+        if (check(mbr))
+        {
+            puts("Legal");
+        }
+        else
+        {
+            puts("Illegal");
+        }
     }
     else if (is_command(command, "DIR"))
     {

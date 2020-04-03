@@ -19,12 +19,14 @@ int main()
         print_path(cur, space);
         putchar('>');
         read_command(command, parameter);
-        if (is_command(command, "EXIT")) {
-        	break;
+        if (is_command(command, "EXIT"))
+        {
+            break;
         }
-        if (is_command(command, "CLS")) {
-        	system("cls");
-        	continue;
+        if (is_command(command, "CLS"))
+        {
+            system("cls");
+            continue;
         }
         //puts(command);
         //puts(parameter);

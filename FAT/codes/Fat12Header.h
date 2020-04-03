@@ -23,32 +23,41 @@ struct Fat12Header
 int check(unsigned char mbr[])
 {
     struct Fat12Header *p = (struct Fat12Header *)(mbr + 3);
-    if ((*(unsigned short *)(p->BPB_BytsPerSec)) != 512) {
-    	return 0;
+    if ((*(unsigned short *)(p->BPB_BytsPerSec)) != 512)
+    {
+        return 0;
     }
-    if (p->BPB_SecPerClus != 1) {
-    	return 0;
+    if (p->BPB_SecPerClus != 1)
+    {
+        return 0;
     }
-    if ((*(unsigned short *)(p->BPB_RsvdSecCnt)) != 1) {
-    	return 0;
+    if ((*(unsigned short *)(p->BPB_RsvdSecCnt)) != 1)
+    {
+        return 0;
     }
-    if (p->BPB_NumFATs != 2) {
-    	return 0;
+    if (p->BPB_NumFATs != 2)
+    {
+        return 0;
     }
-    if ((*(unsigned short *)(p->BPB_RootEntCnt)) != 224) {
-    	return 0;
+    if ((*(unsigned short *)(p->BPB_RootEntCnt)) != 224)
+    {
+        return 0;
     }
-    if ((*(unsigned short *)(p->BPB_TotSec16)) != 2880) {
-    	return 0;
+    if ((*(unsigned short *)(p->BPB_TotSec16)) != 2880)
+    {
+        return 0;
     }
-    if ((*(unsigned short *)(p->BPB_FATSz16)) != 9) {
-    	return 0;
+    if ((*(unsigned short *)(p->BPB_FATSz16)) != 9)
+    {
+        return 0;
     }
     char *FileSysType = "FAT12   ";
-    for (int i = 0; i < 8; i++) {
-    	if (p->BS_FileSysType[i] != FileSysType[i]) {
-    		return 0;
-    	}
+    for (int i = 0; i < 8; i++)
+    {
+        if (p->BS_FileSysType[i] != FileSysType[i])
+        {
+            return 0;
+        }
     }
     return 1;
 }
