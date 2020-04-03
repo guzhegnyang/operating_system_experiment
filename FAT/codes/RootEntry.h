@@ -206,28 +206,31 @@ int top = 0;
 void dfs(unsigned char cur, struct RootEntry space[], int height)
 {
     int i, j;
-    for (i = 0, j = 0; i < top; i++) {
-    	for (; j < height_stack[i] - 1; j++)
-	    {
-	        printf("    ");
-	    }
-	    printf("|   ");
-	    j++;
-    }
-    for (; j < height - 1; j++) 
+    for (i = 0, j = 0; i < top; i++)
     {
-    	printf("    ");
+        for (; j < height_stack[i] - 1; j++)
+        {
+            printf("    ");
+        }
+        printf("|   ");
+        j++;
     }
-    if (height) {
-    	puts("|");
+    for (; j < height - 1; j++)
+    {
+        printf("    ");
     }
-    for (i = 0, j = 0; i < top; i++) {
-    	for (; j < height_stack[i] - 1; j++)
-	    {
-	        printf("    ");
-	    }
-	    printf("|   ");
-	    j++;
+    if (height)
+    {
+        puts("|");
+    }
+    for (i = 0, j = 0; i < top; i++)
+    {
+        for (; j < height_stack[i] - 1; j++)
+        {
+            printf("    ");
+        }
+        printf("|   ");
+        j++;
     }
     for (; j < height - 1; j++)
     {
@@ -241,13 +244,15 @@ void dfs(unsigned char cur, struct RootEntry space[], int height)
     putchar('\n');
     if (space[cur].last_child != Null)
     {
-    	if (height && space[cur].last_sibling != Null) {
-    		height_stack[top++] = height;
-    	}
+        if (height && space[cur].last_sibling != Null)
+        {
+            height_stack[top++] = height;
+        }
         dfs(space[cur].last_child, space, height + 1);
-    	if (height && space[cur].last_sibling != Null) {
-    		top--;
-    	}
+        if (height && space[cur].last_sibling != Null)
+        {
+            top--;
+        }
     }
     if (height)
     {

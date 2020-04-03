@@ -5,7 +5,7 @@ void Init_ramFDD144(unsigned char *ramFDD144, const char *path)
     fp = fopen(path, "rb");
     fread(ramFDD144, 1, 1474560, fp);
     fclose(fp);
-}/*
+} /*
 void Read_ramFDD_Block(unsigned char *ramFDD_Block, const unsigned char *ramFDD144, size_t offset)
 {
     ramFDD144 += offset * 512;

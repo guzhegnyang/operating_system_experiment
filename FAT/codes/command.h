@@ -77,7 +77,7 @@ char *split(char path[])
     return path + i + 1;
 }
 void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
-                     unsigned char mbr[], struct FatItem fat1[], struct FatItem fat2[], struct RootEntry space[], unsigned char data[])
+                     unsigned char mbr[], unsigned char fat1[], unsigned char fat2[], struct RootEntry space[], unsigned char data[])
 {
     if (is_command(command, "CHECK"))
     {

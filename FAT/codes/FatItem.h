@@ -4,6 +4,7 @@ struct two_FatItem
 };
 unsigned short first;
 unsigned short end;
-void Fat_alloc()
+void Fat_delete(unsigned short DIR_FstClus, )
 {
+    
 }
