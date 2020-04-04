@@ -120,7 +120,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         	}
         	parameter++;
         }
-        if (parameter[0] == '>') {
+        if (parameter[0] == '>' && parameter[1] == '\0') {
 	        char *file_name = split(parameter + 2);
 	        unsigned char temp;
 	        if (file_name != NULL)
@@ -136,6 +136,10 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
 	        	file_name = parameter + 2;
 	        	temp = cur;
 	        }
+	        if (locate(file_name, temp, space) != Null) {
+	        	puts("File already exists");
+	        	return;
+	        }
 	    	unsigned char file;
 	        if ((file = memory_alloc(space)) == Null)
 	        {
@@ -144,7 +148,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
 	        else
 	        {
 	            assign(file, file_name, TYPE_NORMAL_FILE, temp, space);
-	            if (*(unsigned short *)space[file].DIR_FstClus == 0xFFF) {
+	            if (!*(unsigned short *)space[file].DIR_FstClus) {
 	            	*(unsigned short *)(space[file].DIR_FstClus) = item_alloc(fat1, fat2);
 	            }
 	        }
@@ -179,6 +183,10 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         	file_name = parameter;
         	temp = *cur_ptr;
         }
+        if (locate(file_name, temp, space) != Null) {
+	        puts("Directory already exists");
+	        return;
+	    }
     	unsigned char file;
         if ((file = memory_alloc(space)) == Null)
         {
@@ -224,6 +232,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
                     puts("All files in directory will be deleted!");
                     puts("Are you sure (Y/N)?");
                     char ch = getchar();
+                    while (getchar() != '\n');
                     if (ch == 'Y' || ch == 'y')
                     {
                         unsigned char p;
@@ -263,5 +272,8 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
                 memory_delete(temp, space);
             }
         }
+    }
+    else {
+    	puts("Bad command or file name");
     }
 }

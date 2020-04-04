@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 #define SIZE 224
 #define Null 0
 #define ROOT 1
@@ -99,21 +100,15 @@ void convert_time(int *hour, int *minute, unsigned short time)
 }
 void init(struct RootEntry space[])
 {
-    space[Null].last_child = 2;
-    *(unsigned short *)space[Null].DIR_FstClus = 0xFFF;
+    memset(space, 0, SIZE * sizeof(struct RootEntry));
+	space[Null].last_child = 2;
     for (int i = 2; i < SIZE; i++)
     {
         space[i].last_child = i + 1;
-        *(unsigned short *)space[i].DIR_FstClus = 0xFFF;
     }
     store_date_time((unsigned short *)space[ROOT].DIR_WrtDate, (unsigned short *)space[ROOT].DIR_WrtTime);
     store_name(space[ROOT].DIR_Name, "ROOT");
     space[ROOT].DIR_Attr = TYPE_DIR;
-    space[ROOT].parent = Null;
-    space[ROOT].last_sibling = Null;
-    space[ROOT].next_sibling = Null;
-    space[ROOT].last_child = Null;
-    *(unsigned short *)space[ROOT].DIR_FstClus = 0xFFF;
 }
 void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsigned char parent, struct RootEntry space[])
 {
@@ -126,6 +121,7 @@ void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsig
     space[node].last_child = Null;
     space[parent].last_child = node;
     space[space[node].last_sibling].next_sibling = node;
+    *(unsigned int *)space[node].DIR_FileSize = 0;
 }
 unsigned char memory_alloc(struct RootEntry space[])
 {
@@ -141,6 +137,9 @@ int memory_delete(unsigned char node, struct RootEntry space[])
     }
     space[node].last_child = space[Null].last_child;
     space[Null].last_child = node;
+    if (space[space[node].parent].last_child == node) {
+    	space[space[node].parent].last_child = space[node].last_sibling;
+    }
     if (space[node].last_sibling != Null) {
     	space[space[node].last_sibling].next_sibling = space[node].next_sibling;
     }
@@ -207,7 +206,7 @@ void list_dir(unsigned char cur, struct RootEntry space[])
             convert_date(&year, &month, &day, *(unsigned short *)space[p].DIR_WrtDate);
             convert_time(&hour, &minute, *(unsigned short *)space[p].DIR_WrtTime);
             print_stored_name(space[p].DIR_Name);
-            printf("      \t%d\t%02d-%02d-%02d   %02d:%02d\n", 0, month, day, year, hour, minute);
+            printf("      \t%d\t%02d-%02d-%02d   %02d:%02d\n", *(unsigned int *)space[p].DIR_FileSize, month, day, year, hour, minute);
         }
     }
 }
@@ -416,7 +415,7 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
     {
         if (path[i] == '.')
         {
-            if (path[i + 1] == '.')
+            if (path[i + 1] == '.' && (path[i + 2] == '\0' || path[i + 2] == '\\'))
             {
                 p = space[p].parent;
                 i += 2;
@@ -426,7 +425,7 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
                 }
                 continue;
             }
-            else
+            else if (path[i + 1] == '\0' || path[i + 1] == '\\')
             {
                 i += 1;
                 if (path[i] == '\\')
@@ -444,6 +443,12 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
                 {
                     break;
                 }
+            }
+            if (j > 8) {
+            	return Null;
+            }
+            if (j < 8 && space[p].DIR_Name[j] != ' ') {
+            	continue;
             }
             if (path[i + j] == '.')
             {
