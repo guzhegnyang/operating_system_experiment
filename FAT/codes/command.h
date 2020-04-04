@@ -180,4 +180,60 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
             }
         }
     }
+    else if (is_command(command, "DEL"))
+    {
+        unsigned char temp = locate(parameter, *cur_ptr, space);
+        if (temp == Null)
+        {
+            puts("Invalid path");
+        }
+        else
+        {
+            if (space[temp].DIR_Attr == TYPE_DIR)
+            {
+                while (1)
+                {
+                    puts("All files in directory will be deleted!");
+                    puts("Are you sure (Y/N)?");
+                    char ch = getchar();
+                    if (ch == 'Y' || ch == 'y')
+                    {
+                        unsigned char p;
+                        for (p = space[temp].last_child; p != Null; p = space[p].last_sibling)
+                        {
+                            if (space[p].DIR_Attr != TYPE_DIR)
+                            {
+                                break;
+                            }
+                        }
+                        if (p == Null)
+                        {
+                            puts("File not found");
+                            break;
+                        }
+                        memory_delete(p, space);
+                        item_delete(*(unsigned short *)space[p].DIR_FstClus, fat1, fat2);
+                        for (; p != Null; p = space[p].last_sibling)
+                        {
+                            if (space[p].DIR_Attr != TYPE_DIR)
+                            {
+                                memory_delete(p, space);
+                                item_delete(*(unsigned short *)space[p].DIR_FstClus, fat1, fat2);
+                            }
+                        }
+                        break;
+                    }
+                    else if (ch == 'N' || ch == 'n')
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                memory_delete(temp, space);
+                item_delete(*(unsigned short *)space[temp].DIR_FstClus, fat1, fat2);
+            }
+        }
+    }
 }

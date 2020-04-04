@@ -9,8 +9,6 @@ int i;
 int main()
 {
     Init_ramFDD144(ramFDD144, "dossys.img");
-    struct FatItem *fat1 = (struct FatItem *)(ramFDD144 + 512);
-    struct FatItem *fat2 = (struct FatItem *)(ramFDD144 + 5120);
     struct RootEntry *space = (struct RootEntry *)(ramFDD144 + 9728);
     unsigned char *data = (unsigned char *)(ramFDD144 + 16896);
     demo(space);
@@ -30,6 +28,6 @@ int main()
         }
         //puts(command);
         //puts(parameter);
-        execute_command(command, parameter, &cur, ramFDD144, fat1, fat2, space, data);
+        execute_command(command, parameter, &cur, ramFDD144, ramFDD144 + 512, ramFDD144 + 5120, space, data);
     }
 }

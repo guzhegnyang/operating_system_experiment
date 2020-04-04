@@ -84,16 +84,16 @@ void store_date_time(unsigned short *date_ptr, unsigned short *time_ptr)
 void convert_date(int *year, int *month, int *day, unsigned short date)
 {
     *day = date % 32;
-    date = date >> 5;
+    date >>= 5;
     *month = date % 16;
-    date = date >> 4;
+    date >>= 4;
     *year = date + 1980;
 }
 void convert_time(int *hour, int *minute, unsigned short time)
 {
-    time = time >> 5;
+    time >>= 5;
     *minute = time % 64;
-    time = time >> 6;
+    time >>= 6;
     *hour = time;
 }
 void init(struct RootEntry space[])
