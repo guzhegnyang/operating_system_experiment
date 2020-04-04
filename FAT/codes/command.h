@@ -33,7 +33,7 @@ void read_command(char command[], char parameter[])
     {
         if (ch == ' ')
         {
-            parameter[i++] = ' ';
+            parameter[i++] = '\0';
             while ((ch = getchar()) == ' ')
                 ;
         }
@@ -104,15 +104,51 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
     }
     else if (is_command(command, "CD"))
     {
-        unsigned char temp = locate(parameter, *cur_ptr, space);
-        if (temp == Null || space[temp].DIR_Attr != TYPE_DIR)
-        {
-            puts("Invalid directory");
+    	unsigned char cur = *cur_ptr;
+        if (parameter[0] != '>') {
+        	unsigned char temp = locate(parameter, *cur_ptr, space);
+        	if (temp == Null || space[temp].DIR_Attr != TYPE_DIR)
+        	{
+            	puts("Invalid directory");
+        	}
+        	else
+        	{
+            	*cur_ptr = temp;
+        	}
+        	while (*parameter != '\0') {
+        		parameter++;
+        	}
+        	parameter++;
         }
-        else
-        {
-            *cur_ptr = temp;
-        }
+        if (parameter[0] == '>') {
+	        char *file_name = split(parameter + 2);
+	        unsigned char temp;
+	        if (file_name != NULL)
+	        {
+	            temp = locate(parameter + 2, cur, space);
+	            if (temp == Null || space[temp].DIR_Attr != TYPE_DIR)
+	            {
+	                puts("Invalid path");
+	                return;
+	            }
+	        }
+	        else {
+	        	file_name = parameter + 2;
+	        	temp = cur;
+	        }
+	    	unsigned char file;
+	        if ((file = memory_alloc(space)) == Null)
+	        {
+	            puts("Space used up");
+	        }
+	        else
+	        {
+	            assign(file, file_name, TYPE_NORMAL_FILE, temp, space);
+	            if (*(unsigned short *)space[file].DIR_FstClus == 0xFFF) {
+	            	*(unsigned short *)(space[file].DIR_FstClus) = item_alloc(fat1, fat2);
+	            }
+	        }
+	    }
     }
     else if (is_command(command, "TREE"))
     {
@@ -133,32 +169,24 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         if (file_name != NULL)
         {
             temp = locate(parameter, *cur_ptr, space);
-            if (temp == Null)
+            if (temp == Null || space[temp].DIR_Attr != TYPE_DIR)
             {
                 puts("Invalid path");
+                return;
             }
-            else
-            {
-                if (space[temp].DIR_Attr != TYPE_DIR)
-                {
-                    puts("Invalid path");
-                }
-                unsigned char file;
-                if ((file = memory_alloc(space)) == Null)
-                {
-                    puts("Space used up");
-                }
-                else
-                {
-
-                    assign(file, file_name, TYPE_DIR, temp, space);
-                }
-            }
+        }
+        else {
+        	file_name = parameter;
+        	temp = *cur_ptr;
+        }
+    	unsigned char file;
+        if ((file = memory_alloc(space)) == Null)
+        {
+            puts("Space used up");
         }
         else
         {
-            unsigned char file = memory_alloc(space);
-            assign(file, parameter, TYPE_DIR, *cur_ptr, space);
+            assign(file, file_name, TYPE_DIR, temp, space);
         }
     }
     else if (is_command(command, "RD"))
@@ -231,8 +259,8 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
             }
             else
             {
-                memory_delete(temp, space);
                 item_delete(*(unsigned short *)space[temp].DIR_FstClus, fat1, fat2);
+                memory_delete(temp, space);
             }
         }
     }

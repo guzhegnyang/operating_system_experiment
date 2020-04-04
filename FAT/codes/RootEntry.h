@@ -4,6 +4,7 @@
 #define Null 0
 #define ROOT 1
 #define TYPE_DIR 0x10
+#define TYPE_NORMAL_FILE 0x20
 struct RootEntry
 {
     char DIR_Name[11];
@@ -57,11 +58,11 @@ void print_name(char name[])
     {
         putchar(name[i]);
     }
-    if (name[9] != ' ')
+    if (name[8] != ' ')
     {
         putchar('.');
     }
-    for (i = 9; i < 11 && name[i] != ' '; i++)
+    for (i = 8; i < 11 && name[i] != ' '; i++)
     {
         putchar(name[i]);
     }
@@ -87,7 +88,7 @@ void convert_date(int *year, int *month, int *day, unsigned short date)
     date >>= 5;
     *month = date % 16;
     date >>= 4;
-    *year = date + 1980;
+    *year = (date + 1980) % 100;
 }
 void convert_time(int *hour, int *minute, unsigned short time)
 {
@@ -99,9 +100,11 @@ void convert_time(int *hour, int *minute, unsigned short time)
 void init(struct RootEntry space[])
 {
     space[Null].last_child = 2;
+    *(unsigned short *)space[Null].DIR_FstClus = 0xFFF;
     for (int i = 2; i < SIZE; i++)
     {
         space[i].last_child = i + 1;
+        *(unsigned short *)space[i].DIR_FstClus = 0xFFF;
     }
     store_date_time((unsigned short *)space[ROOT].DIR_WrtDate, (unsigned short *)space[ROOT].DIR_WrtTime);
     store_name(space[ROOT].DIR_Name, "ROOT");
@@ -110,6 +113,7 @@ void init(struct RootEntry space[])
     space[ROOT].last_sibling = Null;
     space[ROOT].next_sibling = Null;
     space[ROOT].last_child = Null;
+    *(unsigned short *)space[ROOT].DIR_FstClus = 0xFFF;
 }
 void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsigned char parent, struct RootEntry space[])
 {
@@ -137,6 +141,12 @@ int memory_delete(unsigned char node, struct RootEntry space[])
     }
     space[node].last_child = space[Null].last_child;
     space[Null].last_child = node;
+    if (space[node].last_sibling != Null) {
+    	space[space[node].last_sibling].next_sibling = space[node].next_sibling;
+    }
+    if (space[node].next_sibling != Null) {
+    	space[space[node].next_sibling].last_sibling = space[node].last_sibling;
+    }
     return 1;
 }
 int height(unsigned char cur, struct RootEntry space[])
@@ -173,10 +183,10 @@ void list_dir(unsigned char cur, struct RootEntry space[])
     {
         convert_date(&year, &month, &day, *(unsigned short *)space[cur].DIR_WrtDate);
         convert_time(&hour, &minute, *(unsigned short *)space[cur].DIR_WrtTime);
-        printf(".           <DIR>\t\t%02d-%02d-%04d   %02d:%02d\n", month, day, year, hour, minute);
+        printf(".           <DIR>\t\t%02d-%02d-%02d   %02d:%02d\n", month, day, year, hour, minute);
         convert_date(&year, &month, &day, *(unsigned short *)space[space[cur].parent].DIR_WrtDate);
         convert_time(&hour, &minute, *(unsigned short *)space[space[cur].parent].DIR_WrtTime);
-        printf("..          <DIR>\t\t%02d-%02d-%04d   %02d:%02d\n", month, day, year, hour, minute);
+        printf("..          <DIR>\t\t%02d-%02d-%02d   %02d:%02d\n", month, day, year, hour, minute);
     }
     unsigned char p = space[cur].last_child;
     while (space[p].last_sibling != Null)
@@ -190,23 +200,23 @@ void list_dir(unsigned char cur, struct RootEntry space[])
             convert_date(&year, &month, &day, *(unsigned short *)space[p].DIR_WrtDate);
             convert_time(&hour, &minute, *(unsigned short *)space[p].DIR_WrtTime);
             print_stored_name(space[p].DIR_Name);
-            printf(" <DIR>\t\t%02d-%02d-%04d   %02d:%02d\n", month, day, year, hour, minute);
+            printf(" <DIR>\t\t%02d-%02d-%02d   %02d:%02d\n", month, day, year, hour, minute);
         }
         else
         {
             convert_date(&year, &month, &day, *(unsigned short *)space[p].DIR_WrtDate);
             convert_time(&hour, &minute, *(unsigned short *)space[p].DIR_WrtTime);
             print_stored_name(space[p].DIR_Name);
-            printf("\t%d\t%02d-%02d-%04d   %02d:%02d\n", 0, month, day, year, hour, minute);
+            printf("      \t%d\t%02d-%02d-%02d   %02d:%02d\n", 0, month, day, year, hour, minute);
         }
     }
 }
 int height_stack[100];
-int top = 0;
+int height_top = 0;
 void dfs(unsigned char cur, struct RootEntry space[], int height)
 {
     int i, j;
-    for (i = 0, j = 0; i < top; i++)
+    for (i = 0, j = 0; i < height_top; i++)
     {
         for (; j < height_stack[i] - 1; j++)
         {
@@ -223,7 +233,7 @@ void dfs(unsigned char cur, struct RootEntry space[], int height)
     {
         puts("|");
     }
-    for (i = 0, j = 0; i < top; i++)
+    for (i = 0, j = 0; i < height_top; i++)
     {
         for (; j < height_stack[i] - 1; j++)
         {
@@ -246,12 +256,12 @@ void dfs(unsigned char cur, struct RootEntry space[], int height)
     {
         if (height && space[cur].last_sibling != Null)
         {
-            height_stack[top++] = height;
+            height_stack[height_top++] = height;
         }
         dfs(space[cur].last_child, space, height + 1);
         if (height && space[cur].last_sibling != Null)
         {
-            top--;
+            height_top--;
         }
     }
     if (height)
