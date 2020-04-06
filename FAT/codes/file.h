@@ -5,44 +5,57 @@
 #define READ 0
 #define WRITE 1
 #define CURSOR '~'
-struct FileBuffer {
+struct FileBuffer
+{
 	char value;
 	struct FileBuffer *next;
 	struct FileBuffer *last;
 };
-struct ActiveFile {
+struct ActiveFile
+{
 	struct RootEntry *dir;
 	unsigned char uid;
 	int share_counter;
 	struct FileBuffer *fb;
 };
-struct OpenFile {
+struct OpenFile
+{
 	struct FileBuffer *posi;
 	int read_or_write;
 	struct ActiveFile *af;
 };
-struct OpenFile *open(unsigned char uid, char opt, struct ActiveFile active_list[], struct OpenFile open_list[], unsigned char fat[], struct RootEntry space[], unsigned char data[]) {
+struct OpenFile *open(unsigned char uid, char opt, struct ActiveFile active_list[], struct OpenFile open_list[], unsigned char fat[], struct RootEntry space[], unsigned char data[])
+{
 	int i, j, k = -1;
-	for (i = 0; i < MAX_OPEN_FILE && open_list[i].af != NULL; i++);
-	if (i == MAX_OPEN_FILE) {
+	for (i = 0; i < MAX_OPEN_FILE && open_list[i].af != NULL; i++)
+		;
+	if (i == MAX_OPEN_FILE)
+	{
 		return NULL;
 	}
-	for (j = 0; j < MAX_ACTIVE_FILE && active_list[j].uid != Null; j++) {
-		if (uid == active_list[i].uid) {
+	for (j = 0; j < MAX_ACTIVE_FILE && active_list[j].uid != Null; j++)
+	{
+		if (uid == active_list[i].uid)
+		{
 			break;
 		}
-		if (k == -1 && !active_list[j].share_counter) {
+		if (k == -1 && !active_list[j].share_counter)
+		{
 			k = j;
 		}
 	}
-	if (j == MAX_ACTIVE_FILE && k == -1) {
+	if (j == MAX_ACTIVE_FILE && k == -1)
+	{
 		return NULL;
 	}
-	if (uid == active_list[j].uid) {
+	if (uid == active_list[j].uid)
+	{
 		active_list[j].share_counter++;
 	}
-	else {
-		if (k != -1) {
+	else
+	{
+		if (k != -1)
+		{
 			j = k;
 		}
 		active_list[j].dir = (struct RootEntry *)space + uid;
@@ -51,39 +64,46 @@ struct OpenFile *open(unsigned char uid, char opt, struct ActiveFile active_list
 		unsigned int sz = 0;
 		struct FileBuffer *p = NULL;
 		unsigned short clus = *(unsigned short *)active_list[j].dir->DIR_FstClus;
-		while (clus != 0xFFF) {
+		while (clus != 0xFFF)
+		{
 			int offset = (clus - 2) * 512;
-			for (; sz < *(unsigned int *)active_list[j].dir->DIR_FileSize && sz % 512; sz++, offset++) {
-				if (p == NULL) {
-					struct FileBuffer* node = (struct FileBuffer*)malloc(sizeof(struct FileBuffer));
+			for (; sz < *(unsigned int *)active_list[j].dir->DIR_FileSize && sz % 512; sz++, offset++)
+			{
+				if (p == NULL)
+				{
+					struct FileBuffer *node = (struct FileBuffer *)malloc(sizeof(struct FileBuffer));
 					node->last = p;
 					active_list[j].fb = node;
 					p = active_list[j].fb;
 					p->value = data[offset];
 				}
-				else {
-					struct FileBuffer* node = (struct FileBuffer*)malloc(sizeof(struct FileBuffer));
+				else
+				{
+					struct FileBuffer *node = (struct FileBuffer *)malloc(sizeof(struct FileBuffer));
 					node->last = p;
 					p->next = node;
 					p = p->next;
 					p->value = data[offset];
 				}
 			}
-			if (sz == *(unsigned int *)active_list[j].dir->DIR_FileSize) {
+			if (sz == *(unsigned int *)active_list[j].dir->DIR_FileSize)
+			{
 				break;
 			}
 			clus = next_item(clus, fat);
 		}
-		if (p == NULL) {
-			struct FileBuffer* node = (struct FileBuffer*)malloc(sizeof(struct FileBuffer));
+		if (p == NULL)
+		{
+			struct FileBuffer *node = (struct FileBuffer *)malloc(sizeof(struct FileBuffer));
 			node->last = p;
 			active_list[j].fb = node;
 			p = active_list[j].fb;
 			p->value = '\0';
 			p->next = NULL;
 		}
-		else {
-			struct FileBuffer* node = (struct FileBuffer*)malloc(sizeof(struct FileBuffer));
+		else
+		{
+			struct FileBuffer *node = (struct FileBuffer *)malloc(sizeof(struct FileBuffer));
 			node->last = p;
 			p->next = node;
 			p = p->next;
@@ -92,33 +112,41 @@ struct OpenFile *open(unsigned char uid, char opt, struct ActiveFile active_list
 		}
 	}
 	open_list[i].posi = active_list[j].fb;
-	if (opt == 'w') {
+	if (opt == 'w')
+	{
 		open_list[i].read_or_write = WRITE;
 	}
-	else {
+	else
+	{
 		open_list[i].read_or_write = READ;
 	}
 	open_list[i].af = active_list + j;
 	return open_list + i;
 }
-int close(struct OpenFile *fp, unsigned char fat1[], unsigned char fat2[], unsigned char data[]) {
+int close(struct OpenFile *fp, unsigned char fat1[], unsigned char fat2[], unsigned char data[])
+{
 	fp->af->share_counter--;
-	if (!fp->af->share_counter) {
+	if (!fp->af->share_counter)
+	{
 		unsigned int sz = 0;
 		struct FileBuffer *p = fp->af->fb;
 		unsigned short clus = *(unsigned short *)fp->af->dir->DIR_FstClus;
 		int offset = (clus - 2) * 512;
-		while (p->next->next != NULL) {
+		while (p->next->next != NULL)
+		{
 			data[offset] = p->value;
 			p = p->next;
 			free(p->last);
 			offset++;
 			sz++;
-			if (!sz % 512) {
+			if (!sz % 512)
+			{
 				clus = next_item(clus, fat1);
-				if (clus == 0xFFF) {
+				if (clus == 0xFFF)
+				{
 					clus = item_alloc(fat1, fat2);
-					if (clus == 0xFFF) {
+					if (clus == 0xFFF)
+					{
 						return 0;
 					}
 				}
@@ -129,7 +157,8 @@ int close(struct OpenFile *fp, unsigned char fat1[], unsigned char fat2[], unsig
 		data[offset] = p->value;
 		free(p);
 		sz++;
-		if (next_item(clus, fat1) != 0xFFF) {
+		if (next_item(clus, fat1) != 0xFFF)
+		{
 			item_delete(clus, fat1, fat2);
 			modify_next_item(clus, 0xFFF, fat1, fat2);
 		}
@@ -138,62 +167,80 @@ int close(struct OpenFile *fp, unsigned char fat1[], unsigned char fat2[], unsig
 	fp->af = NULL;
 	return 1;
 }
-int read(struct OpenFile *fp, int sz, struct FileBuffer *posi) {
+int read(struct OpenFile *fp, int sz, struct FileBuffer *posi)
+{
 	struct FileBuffer *p;
-	if (posi != NULL) {
+	if (posi != NULL)
+	{
 		p = posi;
 	}
-	else {
+	else
+	{
 		p = fp->af->fb;
 	}
 	int i;
-	for (i = 0; (sz == -1 || (sz != -1 && i < sz)) && p != NULL; i++, p = p->next) {
-		if (posi == NULL && p == fp->posi) {
+	for (i = 0; (sz == -1 || (sz != -1 && i < sz)) && p != NULL; i++, p = p->next)
+	{
+		if (posi == NULL && p == fp->posi)
+		{
 			putchar(CURSOR);
 		}
-		else {
+		else
+		{
 			putchar(p->value);
 		}
 	}
 	return i;
 }
-int write(struct OpenFile *fp, unsigned char buf[]) {
-	if (fp->read_or_write != WRITE) {
+int write(struct OpenFile *fp, unsigned char buf[])
+{
+	if (fp->read_or_write != WRITE)
+	{
 		return -1;
 	}
 	int i = 0;
 	struct FileBuffer *p;
-	for (p = fp->posi; ; buf++, p = p->next, i++) {
+	for (p = fp->posi;; buf++, p = p->next, i++)
+	{
 		p->value = *buf;
-		if (p->next == NULL && *buf) {
-			p->next = (struct FileBuffer*)malloc(sizeof(struct FileBuffer));
+		if (p->next == NULL && *buf)
+		{
+			p->next = (struct FileBuffer *)malloc(sizeof(struct FileBuffer));
 			p->next->last = p;
 			p->next->next = NULL;
 		}
-		if (!*buf) {
+		if (!*buf)
+		{
 			break;
 		}
 	}
-	if (p != NULL) {
+	if (p != NULL)
+	{
 		p->last->next = NULL;
-		while (p->next != NULL) {
+		while (p->next != NULL)
+		{
 			p = p->next;
 			free(p->last);
 		}
 	}
 	return i;
 }
-int seek(struct OpenFile *fp, int offset, struct FileBuffer *start) {
+int seek(struct OpenFile *fp, int offset, struct FileBuffer *start)
+{
 	struct FileBuffer *posi = start;
-	while (offset > 0) {
-		if (posi == NULL) {
+	while (offset > 0)
+	{
+		if (posi == NULL)
+		{
 			return 0;
 		}
 		posi = posi->next;
 		offset--;
 	}
-	while (offset < 0) {
-		if (posi == NULL) {
+	while (offset < 0)
+	{
+		if (posi == NULL)
+		{
 			return 0;
 		}
 		posi = posi->last;
@@ -202,28 +249,35 @@ int seek(struct OpenFile *fp, int offset, struct FileBuffer *start) {
 	fp->posi = posi;
 	return 1;
 }
-int insert(struct OpenFile *fp, unsigned char ch) {
-	if (fp->read_or_write != WRITE) {
+int insert(struct OpenFile *fp, unsigned char ch)
+{
+	if (fp->read_or_write != WRITE)
+	{
 		return 0;
 	}
-	fp->posi->last->next = (struct FileBuffer*)malloc(sizeof(struct FileBuffer));
+	fp->posi->last->next = (struct FileBuffer *)malloc(sizeof(struct FileBuffer));
 	fp->posi->last->next->last = fp->posi->last;
 	fp->posi->last = fp->posi->last->next;
 	fp->posi->last->next = fp->posi;
 	fp->posi->last->value = ch;
 	return 1;
 }
-int erase(struct OpenFile *fp) {
-	if (fp->read_or_write != WRITE) {
+int erase(struct OpenFile *fp)
+{
+	if (fp->read_or_write != WRITE)
+	{
 		return 0;
 	}
-	if (fp->posi->last != NULL) {
-		if (fp->posi->last->last != NULL) {
+	if (fp->posi->last != NULL)
+	{
+		if (fp->posi->last->last != NULL)
+		{
 			fp->posi->last = fp->posi->last->last;
 			free(fp->posi->last->next);
 			fp->posi->last->next = fp->posi;
 		}
-		else {
+		else
+		{
 			free(fp->posi->last);
 			fp->posi->last = NULL;
 		}

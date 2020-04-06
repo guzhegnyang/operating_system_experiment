@@ -51,7 +51,7 @@ int check(unsigned char mbr[])
     {
         return 0;
     }
-    char *FileSysType = "FAT12   ";
+    const char *FileSysType = "FAT12   ";
     for (int i = 0; i < 8; i++)
     {
         if (p->BS_FileSysType[i] != FileSysType[i])

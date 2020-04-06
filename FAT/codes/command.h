@@ -81,18 +81,22 @@ char *split(char path[])
     path[i] = '\0';
     return path + i + 1;
 }
-int check_name(char *name) {
-	int i;
-	for (i = 0; name[i]; i++) {
-		if (name[i] == '.') {
-			i++;
-			continue;
-		}
-		if (!((name[i] >= '0' && name[i] <= '9') || (name[i] >= 'A' && name[i] <= 'Z'))) {
-			return 0;
-		}
-	}
-	return 1;
+int check_name(char *name)
+{
+    int i;
+    for (i = 0; name[i]; i++)
+    {
+        if (name[i] == '.')
+        {
+            i++;
+            continue;
+        }
+        if (!((name[i] >= '0' && name[i] <= '9') || (name[i] >= 'A' && name[i] <= 'Z')))
+        {
+            return 0;
+        }
+    }
+    return 1;
 }
 void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
                      unsigned char mbr[], unsigned char fat1[], unsigned char fat2[], struct RootEntry space[], unsigned char data[], struct ActiveFile active_list[], struct OpenFile open_list[])
@@ -122,56 +126,62 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
     }
     else if (is_command(command, "CD"))
     {
-    	unsigned char cur = *cur_ptr;
-        if (parameter[0] != '>') {
-        	unsigned char temp = locate(parameter, *cur_ptr, space);
-        	if (temp == Null || space[temp].DIR_Attr != TYPE_DIR)
-        	{
-            	puts("Invalid directory");
-        	}
-        	else
-        	{
-            	*cur_ptr = temp;
-        	}
-        	while (*parameter != ' ') {
-        		parameter++;
-        	}
-        	parameter++;
+        unsigned char cur = *cur_ptr;
+        if (parameter[0] != '>')
+        {
+            unsigned char temp = locate(parameter, *cur_ptr, space);
+            if (temp == Null || space[temp].DIR_Attr != TYPE_DIR)
+            {
+                puts("Invalid directory");
+            }
+            else
+            {
+                *cur_ptr = temp;
+            }
+            while (*parameter != ' ')
+            {
+                parameter++;
+            }
+            parameter++;
         }
-        if (parameter[0] == '>' && parameter[1] == ' ') {
-	        char *file_name = split(parameter + 2);
-	        unsigned char temp;
-	        if (file_name != NULL)
-	        {
-	            temp = locate(parameter + 2, cur, space);
-	            if (temp == Null || space[temp].DIR_Attr != TYPE_DIR)
-	            {
-	                puts("Invalid path");
-	                return;
-	            }
-	        }
-	        else {
-	        	file_name = parameter + 2;
-	        	temp = cur;
-	        }
-	        if (!check_name(file_name)) {
-	        	puts("Invalid file name");
-	        	return;
-	        }
-	        if (locate(file_name, temp, space) != Null) {
-	        	puts("File already exists");
-	        	return;
-	        }
-	    	unsigned char file;
-	        if ((file = memory_alloc(space)) == Null)
-	        {
-	            puts("Space used up");
-	        }
-	        else
-	        {
-	            assign(file, file_name, TYPE_NORMAL_FILE, temp, fat1, fat2, space);
-	        }
-	    }
+        if (parameter[0] == '>' && parameter[1] == ' ')
+        {
+            char *file_name = split(parameter + 2);
+            unsigned char temp;
+            if (file_name != NULL)
+            {
+                temp = locate(parameter + 2, cur, space);
+                if (temp == Null || space[temp].DIR_Attr != TYPE_DIR)
+                {
+                    puts("Invalid path");
+                    return;
+                }
+            }
+            else
+            {
+                file_name = parameter + 2;
+                temp = cur;
+            }
+            if (!check_name(file_name))
+            {
+                puts("Invalid file name");
+                return;
+            }
+            if (locate(file_name, temp, space) != Null)
+            {
+                puts("File already exists");
+                return;
+            }
+            unsigned char file;
+            if ((file = memory_alloc(space)) == Null)
+            {
+                puts("Space used up");
+            }
+            else
+            {
+                assign(file, file_name, TYPE_NORMAL_FILE, temp, fat1, fat2, space);
+            }
+        }
     }
     else if (is_command(command, "TREE"))
     {
@@ -198,19 +208,22 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
                 return;
             }
         }
-        else {
-        	file_name = parameter;
-        	temp = *cur_ptr;
+        else
+        {
+            file_name = parameter;
+            temp = *cur_ptr;
         }
-        if (!check_name(file_name)) {
-	        puts("Invalid directory name");
-	        return;
-	    }
-        if (locate(file_name, temp, space) != Null) {
-	        puts("Directory already exists");
-	        return;
-	    }
-    	unsigned char file;
+        if (!check_name(file_name))
+        {
+            puts("Invalid directory name");
+            return;
+        }
+        if (locate(file_name, temp, space) != Null)
+        {
+            puts("Directory already exists");
+            return;
+        }
+        unsigned char file;
         if ((file = memory_alloc(space)) == Null)
         {
             puts("Space used up");
@@ -255,7 +268,8 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
                     puts("All files in directory will be deleted!");
                     puts("Are you sure (Y/N)?");
                     char ch = getchar();
-                    while (getchar() != '\n');
+                    while (getchar() != '\n')
+                        ;
                     if (ch == 'Y' || ch == 'y')
                     {
                         unsigned char p;
@@ -296,65 +310,79 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
             }
         }
     }
-    else if (is_command(command, "REN")) {
-		unsigned char temp = locate(parameter, *cur_ptr, space);
-    	if (temp == Null)
-    	{
-        	puts("File not found");
-        	return;
-    	}
-    	while (*parameter != ' ') {
-			parameter++;
-		}
-		parameter++;
-		if (!check_name(parameter)) {
-			puts("Invalid file name");
-			return;
-		}
-		store_name(space[temp].DIR_Name, parameter);
+    else if (is_command(command, "REN"))
+    {
+        unsigned char temp = locate(parameter, *cur_ptr, space);
+        if (temp == Null)
+        {
+            puts("File not found");
+            return;
+        }
+        while (*parameter != ' ')
+        {
+            parameter++;
+        }
+        parameter++;
+        if (!check_name(parameter))
+        {
+            puts("Invalid file name");
+            return;
+        }
+        store_name(space[temp].DIR_Name, parameter);
     }
-    else if (is_command(command, "EDIT")) {
-    	unsigned char temp = locate(parameter, *cur_ptr, space);
-    	if (temp == Null)
-    	{
-        	puts("File not found");
-        	return;
-    	}
-    	struct OpenFile *fp;
-    	if ((fp = open(temp, 'w', active_list, open_list, fat1, space, data)) == NULL) {
-    		puts("Too much files opend");
-    		return;
-    	}
-    	system("cls");
-    	read(fp, -1, NULL);
-    	char ch;
-    	while ((ch = getch()) != ESC) {
-    		if (ch == '\b') {
-    			erase(fp);	
-    		}
-    		else if (ch == LEFT) {
-    			seek(fp, -1, fp->posi);
-    		}
-    		else if (ch == RIGHT) {
-    			seek(fp, 1, fp->posi);
-    		}
-    		else if (ch == UP) {
-    			continue;
-    		}
-    		else if (ch == DOWN) {
-    			continue;
-    		}
-    		else {
-    			insert(fp, ch);
-    		}
-    		system("cls");
-    		read(fp, -1, NULL);
-    	}
-    	if (!close(fp, fat1, fat2, data)) {
-    		puts("Fail saving, space used up");
-    	}
+    else if (is_command(command, "EDIT"))
+    {
+        unsigned char temp = locate(parameter, *cur_ptr, space);
+        if (temp == Null)
+        {
+            puts("File not found");
+            return;
+        }
+        struct OpenFile *fp;
+        if ((fp = open(temp, 'w', active_list, open_list, fat1, space, data)) == NULL)
+        {
+            puts("Too much files opend");
+            return;
+        }
+        system("cls");
+        read(fp, -1, NULL);
+        char ch;
+        while ((ch = getch()) != ESC)
+        {
+            if (ch == '\b')
+            {
+                erase(fp);
+            }
+            else if (ch == LEFT)
+            {
+                seek(fp, -1, fp->posi);
+            }
+            else if (ch == RIGHT)
+            {
+                seek(fp, 1, fp->posi);
+            }
+            else if (ch == UP)
+            {
+                continue;
+            }
+            else if (ch == DOWN)
+            {
+                continue;
+            }
+            else
+            {
+                insert(fp, ch);
+            }
+            system("cls");
+            read(fp, -1, NULL);
+        }
+        if (!close(fp, fat1, fat2, data))
+        {
+            puts("Fail saving, space used up");
+        }
     }
-    else {
-    	puts("Bad command or file name");
+    else
+    {
+        puts("Bad command or file name");
     }
 }

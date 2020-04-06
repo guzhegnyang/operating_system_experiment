@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
 #include "fatItem.h"
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 #define SIZE 224
 #define Null 0
 #define ROOT 1
@@ -36,11 +36,13 @@ void store_name(char stored_name[], const char name[])
             stored_name[j] = ' ';
         }
     }
-    for (; name[i]; i++) {
-    	if (name[i] == '.') {
-    		i++;
-    		break;
-    	}
+    for (; name[i]; i++)
+    {
+        if (name[i] == '.')
+        {
+            i++;
+            break;
+        }
     }
     for (j = 8; j < 11; j++)
     {
@@ -104,7 +106,7 @@ void convert_time(int *hour, int *minute, unsigned short time)
 void init(struct RootEntry space[])
 {
     memset(space, 0, SIZE * sizeof(struct RootEntry));
-	space[Null].last_child = 2;
+    space[Null].last_child = 2;
     for (int i = 2; i < SIZE; i++)
     {
         space[i].last_child = i + 1;
@@ -124,20 +126,25 @@ void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsig
     space[node].last_child = Null;
     space[parent].last_child = node;
     space[space[node].last_sibling].next_sibling = node;
-	if (DIR_Attr == TYPE_DIR) {
-		if (*(unsigned short *)space[node].DIR_FstClus) {
-			modify_next_item(*(unsigned short *)space[node].DIR_FstClus, 0xFFF, fat1, fat2);
-			*(unsigned short *)space[node].DIR_FstClus = 0;
-		}
-	}
-	else if (DIR_Attr == TYPE_NORMAL_FILE) {
-		if (*(unsigned short *)space[node].DIR_FstClus) {
-			modify_next_item(*(unsigned short *)space[node].DIR_FstClus, 0xFFF, fat1, fat2);
-		}
-		else {
-	        *(unsigned short *)space[node].DIR_FstClus = item_alloc(fat1, fat2);
-		}
-	}
+    if (DIR_Attr == TYPE_DIR)
+    {
+        if (*(unsigned short *)space[node].DIR_FstClus)
+        {
+            modify_next_item(*(unsigned short *)space[node].DIR_FstClus, 0xFFF, fat1, fat2);
+            *(unsigned short *)space[node].DIR_FstClus = 0;
+        }
+    }
+    else if (DIR_Attr == TYPE_NORMAL_FILE)
+    {
+        if (*(unsigned short *)space[node].DIR_FstClus)
+        {
+            modify_next_item(*(unsigned short *)space[node].DIR_FstClus, 0xFFF, fat1, fat2);
+        }
+        else
+        {
+            *(unsigned short *)space[node].DIR_FstClus = item_alloc(fat1, fat2);
+        }
+    }
     *(unsigned int *)space[node].DIR_FileSize = 0;
 }
 unsigned char memory_alloc(struct RootEntry space[])
@@ -154,14 +161,17 @@ int memory_delete(unsigned char node, struct RootEntry space[])
     }
     space[node].last_child = space[Null].last_child;
     space[Null].last_child = node;
-    if (space[space[node].parent].last_child == node) {
-    	space[space[node].parent].last_child = space[node].last_sibling;
+    if (space[space[node].parent].last_child == node)
+    {
+        space[space[node].parent].last_child = space[node].last_sibling;
     }
-    if (space[node].last_sibling != Null) {
-    	space[space[node].last_sibling].next_sibling = space[node].next_sibling;
+    if (space[node].last_sibling != Null)
+    {
+        space[space[node].last_sibling].next_sibling = space[node].next_sibling;
     }
-    if (space[node].next_sibling != Null) {
-    	space[space[node].next_sibling].last_sibling = space[node].last_sibling;
+    if (space[node].next_sibling != Null)
+    {
+        space[space[node].next_sibling].last_sibling = space[node].last_sibling;
     }
     return 1;
 }
@@ -461,11 +471,13 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
                     break;
                 }
             }
-            if (j > 8) {
-            	return Null;
+            if (j > 8)
+            {
+                return Null;
             }
-            if (j < 8 && space[p].DIR_Name[j] != ' ') {
-            	continue;
+            if (j < 8 && space[p].DIR_Name[j] != ' ')
+            {
+                continue;
             }
             if (path[i + j] == '.')
             {
@@ -476,12 +488,14 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
                         break;
                     }
                 }
-                if (space[p].DIR_Name[k] != ' ') {
-                	continue;
+                if (space[p].DIR_Name[k] != ' ')
+                {
+                    continue;
                 }
             }
-            else if (space[p].DIR_Name[8] != ' ') {
-            	continue;
+            else if (space[p].DIR_Name[8] != ' ')
+            {
+                continue;
             }
             if (!path[i + j] || path[i + j] == ' ')
             {

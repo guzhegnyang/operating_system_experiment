@@ -1,22 +1,23 @@
 # Details
 
-Date : 2020-03-31 21:22:36
+Date : 2020-04-06 21:07:17
 
 Directory f:\谷正阳\代码\操作系统实验\FAT\codes
 
-Total : 7 files,  711 codes, 68 comments, 1 blanks, all 780 lines
+Total : 8 files,  1390 codes, 68 comments, 0 blanks, all 1458 lines
 
 [summary](results.md)
 
 ## Files
 | filename | language | code | comment | blank | total |
 | :--- | :--- | ---: | ---: | ---: | ---: |
-| [Fat12Header.h](/Fat12Header.h) | C++ | 26 | 0 | 0 | 26 |
-| [FatItem.h](/FatItem.h) | C++ | 5 | 0 | 0 | 5 |
 | [RootEntry(not used).h](/RootEntry(not used).h) | C++ | 10 | 0 | 0 | 10 |
-| [RootEntry.h](/RootEntry.h) | C++ | 451 | 50 | 0 | 501 |
-| [command.h](/command.h) | C++ | 180 | 0 | 1 | 181 |
-| [main.c](/main.c) | C | 24 | 2 | 0 | 26 |
+| [command.h](/command.h) | C++ | 388 | 0 | 0 | 388 |
+| [fat12Header.h](/fat12Header.h) | C++ | 63 | 0 | 0 | 63 |
+| [fatItem.h](/fatItem.h) | C++ | 67 | 0 | 0 | 67 |
+| [file.h](/file.h) | C++ | 286 | 0 | 0 | 286 |
+| [main.c](/main.c) | C | 30 | 2 | 0 | 32 |
 | [ramFDD.h](/ramFDD.h) | C++ | 15 | 16 | 0 | 31 |
+| [rootEntry.h](/rootEntry.h) | C++ | 531 | 50 | 0 | 581 |
 
 [summary](results.md)
