@@ -1,7 +1,12 @@
-#include "Fat12Header.h"
-#include "FatItem.h"
-#include "RootEntry.h"
+#include "fat12Header.h"
+#include "file.h"
 #include "ramFDD.h"
+#include <conio.h>
+#define ESC 0x1b
+#define LEFT 37
+#define UP 38
+#define RIGHT 39
+#define DOWN 40
 void read_command(char command[], char parameter[])
 {
     int i;
@@ -33,7 +38,7 @@ void read_command(char command[], char parameter[])
     {
         if (ch == ' ')
         {
-            parameter[i++] = '\0';
+            parameter[i++] = ' ';
             while ((ch = getchar()) == ' ')
                 ;
         }
@@ -76,8 +81,21 @@ char *split(char path[])
     path[i] = '\0';
     return path + i + 1;
 }
+int check_name(char *name) {
+	int i;
+	for (i = 0; name[i]; i++) {
+		if (name[i] == '.') {
+			i++;
+			continue;
+		}
+		if (!((name[i] >= '0' && name[i] <= '9') || (name[i] >= 'A' && name[i] <= 'Z'))) {
+			return 0;
+		}
+	}
+	return 1;
+}
 void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
-                     unsigned char mbr[], unsigned char fat1[], unsigned char fat2[], struct RootEntry space[], unsigned char data[])
+                     unsigned char mbr[], unsigned char fat1[], unsigned char fat2[], struct RootEntry space[], unsigned char data[], struct ActiveFile active_list[], struct OpenFile open_list[])
 {
     if (is_command(command, "CHECK"))
     {
@@ -115,12 +133,12 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         	{
             	*cur_ptr = temp;
         	}
-        	while (*parameter != '\0') {
+        	while (*parameter != ' ') {
         		parameter++;
         	}
         	parameter++;
         }
-        if (parameter[0] == '>' && parameter[1] == '\0') {
+        if (parameter[0] == '>' && parameter[1] == ' ') {
 	        char *file_name = split(parameter + 2);
 	        unsigned char temp;
 	        if (file_name != NULL)
@@ -136,6 +154,10 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
 	        	file_name = parameter + 2;
 	        	temp = cur;
 	        }
+	        if (!check_name(file_name)) {
+	        	puts("Invalid file name");
+	        	return;
+	        }
 	        if (locate(file_name, temp, space) != Null) {
 	        	puts("File already exists");
 	        	return;
@@ -147,10 +169,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
 	        }
 	        else
 	        {
-	            assign(file, file_name, TYPE_NORMAL_FILE, temp, space);
-	            if (!*(unsigned short *)space[file].DIR_FstClus) {
-	            	*(unsigned short *)(space[file].DIR_FstClus) = item_alloc(fat1, fat2);
-	            }
+	            assign(file, file_name, TYPE_NORMAL_FILE, temp, fat1, fat2, space);
 	        }
 	    }
     }
@@ -183,6 +202,10 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         	file_name = parameter;
         	temp = *cur_ptr;
         }
+        if (!check_name(file_name)) {
+	        puts("Invalid directory name");
+	        return;
+	    }
         if (locate(file_name, temp, space) != Null) {
 	        puts("Directory already exists");
 	        return;
@@ -194,7 +217,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         }
         else
         {
-            assign(file, file_name, TYPE_DIR, temp, space);
+            assign(file, file_name, TYPE_DIR, temp, fat1, fat2, space);
         }
     }
     else if (is_command(command, "RD"))
@@ -272,6 +295,64 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
                 memory_delete(temp, space);
             }
         }
+    }
+    else if (is_command(command, "REN")) {
+		unsigned char temp = locate(parameter, *cur_ptr, space);
+    	if (temp == Null)
+    	{
+        	puts("File not found");
+        	return;
+    	}
+    	while (*parameter != ' ') {
+			parameter++;
+		}
+		parameter++;
+		if (!check_name(parameter)) {
+			puts("Invalid file name");
+			return;
+		}
+		store_name(space[temp].DIR_Name, parameter);
+    }
+    else if (is_command(command, "EDIT")) {
+    	unsigned char temp = locate(parameter, *cur_ptr, space);
+    	if (temp == Null)
+    	{
+        	puts("File not found");
+        	return;
+    	}
+    	struct OpenFile *fp;
+    	if ((fp = open(temp, 'w', active_list, open_list, fat1, space, data)) == NULL) {
+    		puts("Too much files opend");
+    		return;
+    	}
+    	system("cls");
+    	read(fp, -1, NULL);
+    	char ch;
+    	while ((ch = getch()) != ESC) {
+    		if (ch == '\b') {
+    			erase(fp);	
+    		}
+    		else if (ch == LEFT) {
+    			seek(fp, -1, fp->posi);
+    		}
+    		else if (ch == RIGHT) {
+    			seek(fp, 1, fp->posi);
+    		}
+    		else if (ch == UP) {
+    			continue;
+    		}
+    		else if (ch == DOWN) {
+    			continue;
+    		}
+    		else {
+    			insert(fp, ch);
+    		}
+    		system("cls");
+    		read(fp, -1, NULL);
+    	}
+    	if (!close(fp, fat1, fat2, data)) {
+    		puts("Fail saving, space used up");
+    	}
     }
     else {
     	puts("Bad command or file name");

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include "fatItem.h"
 #define SIZE 224
 #define Null 0
 #define ROOT 1
@@ -35,9 +36,11 @@ void store_name(char stored_name[], const char name[])
             stored_name[j] = ' ';
         }
     }
-    if (name[i])
-    {
-        i++;
+    for (; name[i]; i++) {
+    	if (name[i] == '.') {
+    		i++;
+    		break;
+    	}
     }
     for (j = 8; j < 11; j++)
     {
@@ -110,7 +113,7 @@ void init(struct RootEntry space[])
     store_name(space[ROOT].DIR_Name, "ROOT");
     space[ROOT].DIR_Attr = TYPE_DIR;
 }
-void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsigned char parent, struct RootEntry space[])
+void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsigned char parent, unsigned char fat1[], unsigned char fat2[], struct RootEntry space[])
 {
     store_date_time((unsigned short *)space[node].DIR_WrtDate, (unsigned short *)space[node].DIR_WrtTime);
     store_name(space[node].DIR_Name, name);
@@ -121,6 +124,20 @@ void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsig
     space[node].last_child = Null;
     space[parent].last_child = node;
     space[space[node].last_sibling].next_sibling = node;
+	if (DIR_Attr == TYPE_DIR) {
+		if (*(unsigned short *)space[node].DIR_FstClus) {
+			modify_next_item(*(unsigned short *)space[node].DIR_FstClus, 0xFFF, fat1, fat2);
+			*(unsigned short *)space[node].DIR_FstClus = 0;
+		}
+	}
+	else if (DIR_Attr == TYPE_NORMAL_FILE) {
+		if (*(unsigned short *)space[node].DIR_FstClus) {
+			modify_next_item(*(unsigned short *)space[node].DIR_FstClus, 0xFFF, fat1, fat2);
+		}
+		else {
+	        *(unsigned short *)space[node].DIR_FstClus = item_alloc(fat1, fat2);
+		}
+	}
     *(unsigned int *)space[node].DIR_FileSize = 0;
 }
 unsigned char memory_alloc(struct RootEntry space[])
@@ -411,11 +428,11 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
     {
         i = 1;
     }
-    while (p != Null && path[i])
+    while (p != Null && path[i] && path[i] != ' ')
     {
         if (path[i] == '.')
         {
-            if (path[i + 1] == '.' && (path[i + 2] == '\0' || path[i + 2] == '\\'))
+            if (path[i + 1] == '.' && (!path[i + 2] || path[i + 2] == ' ' || path[i + 2] == '\\'))
             {
                 p = space[p].parent;
                 i += 2;
@@ -425,7 +442,7 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
                 }
                 continue;
             }
-            else if (path[i + 1] == '\0' || path[i + 1] == '\\')
+            else if (!path[i + 1] || path[i + 1] == ' ' || path[i + 1] == '\\')
             {
                 i += 1;
                 if (path[i] == '\\')
@@ -437,7 +454,7 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
         }
         for (p = space[p].last_child; p != Null; p = space[p].last_sibling)
         {
-            for (j = 0; path[i + j] && path[i + j] != '\\' && path[i + j] != '.'; j++)
+            for (j = 0; path[i + j] && path[i + j] != ' ' && path[i + j] != '\\' && path[i + j] != '.'; j++)
             {
                 if (space[p].DIR_Name[j] != path[i + j])
                 {
@@ -452,15 +469,21 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
             }
             if (path[i + j] == '.')
             {
-                for (j++, k = 8; path[i + j] && path[i + j] != '\\'; j++)
+                for (j++, k = 8; path[i + j] && path[i + j] != ' ' && path[i + j] != '\\'; j++, k++)
                 {
                     if (space[p].DIR_Name[k] != path[i + j])
                     {
                         break;
                     }
                 }
+                if (space[p].DIR_Name[k] != ' ') {
+                	continue;
+                }
             }
-            if (!path[i + j])
+            else if (space[p].DIR_Name[8] != ' ') {
+            	continue;
+            }
+            if (!path[i + j] || path[i + j] == ' ')
             {
                 i += j;
                 break;
@@ -474,58 +497,58 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
     }
     return p;
 }
-void demo(struct RootEntry space1[])
+void demo(unsigned char fat1[], unsigned char fat2[], struct RootEntry space1[])
 {
     init(space1);
     /*unsigned char IO1 = memory_alloc(space1);
-    assign(IO1, "IO.SYS", 0x27, ROOT, space1);
+    assign(IO1, "IO.SYS", 0x27, ROOT, fat1, fat2, space1);
     unsigned char MSDOS1 = memory_alloc(space1);
-    assign(MSDOS1, "MSDOS.SYS", 0x27, ROOT, space1);
+    assign(MSDOS1, "MSDOS.SYS", 0x27, ROOT, fat1, fat2, space1);
     unsigned char COMMAND1 = memory_alloc(space1);
-    assign(COMMAND1, "COMMAND.COM", 0x20, ROOT, space1);
+    assign(COMMAND1, "COMMAND.COM", 0x20, ROOT, fat1, fat2, space1);
     unsigned char DRVSPACE1 = memory_alloc(space1);
-    assign(DRVSPACE1, "DRVSPACE.BIN", 0x27, ROOT, space1);*/
+    assign(DRVSPACE1, "DRVSPACE.BIN", 0x27, ROOT, fat1, fat2, space1);*/
     unsigned char USER1 = memory_alloc(space1);
-    assign(USER1, "USER", TYPE_DIR, ROOT, space1);
+    assign(USER1, "USER", TYPE_DIR, ROOT, fat1, fat2, space1);
     unsigned char JOIN1 = memory_alloc(space1);
-    assign(JOIN1, "JOIN", TYPE_DIR, USER1, space1);
+    assign(JOIN1, "JOIN", TYPE_DIR, USER1, fat1, fat2, space1);
     unsigned char JACK1 = memory_alloc(space1);
-    assign(JACK1, "JACK", TYPE_DIR, USER1, space1);
+    assign(JACK1, "JACK", TYPE_DIR, USER1, fat1, fat2, space1);
     unsigned char LUCY1 = memory_alloc(space1);
-    assign(LUCY1, "LUCY", TYPE_DIR, USER1, space1);
+    assign(LUCY1, "LUCY", TYPE_DIR, USER1, fat1, fat2, space1);
     unsigned char MUSIC1 = memory_alloc(space1);
-    assign(MUSIC1, "MUSIC", TYPE_DIR, JOIN1, space1);
+    assign(MUSIC1, "MUSIC", TYPE_DIR, JOIN1, fat1, fat2, space1);
     unsigned char PICTURE1 = memory_alloc(space1);
-    assign(PICTURE1, "PICTURE", TYPE_DIR, JOIN1, space1);
+    assign(PICTURE1, "PICTURE", TYPE_DIR, JOIN1, fat1, fat2, space1);
     unsigned char BOOK1 = memory_alloc(space1);
-    assign(BOOK1, "BOOK", TYPE_DIR, JOIN1, space1);
+    assign(BOOK1, "BOOK", TYPE_DIR, JOIN1, fat1, fat2, space1);
     /*unsigned char HOULAI1 = memory_alloc(space1);
-    assign(HOULAI1, "HOULAI.TXT", 0x20, MUSIC1, space1);
+    assign(HOULAI1, "HOULAI.TXT", 0x20, MUSIC1, fat1, fat2, space1);
     init(space2);
     unsigned char COMMAND2 = memory_alloc(space2);
-    assign(COMMAND2, "COMMAND.COM", 0x20, ROOT, space2);
+    assign(COMMAND2, "COMMAND.COM", 0x20, ROOT, fat1, fat2, space2);
     unsigned char IO2 = memory_alloc(space2);
-    assign(IO2, "IO.SYS", 0x27, ROOT, space2);
+    assign(IO2, "IO.SYS", 0x27, ROOT, fat1, fat2, space2);
     unsigned char MSDOS2 = memory_alloc(space2);
-    assign(MSDOS2, "MSDOS.SYS", 0x27, ROOT, space2);
+    assign(MSDOS2, "MSDOS.SYS", 0x27, ROOT, fat1, fat2, space2);
     unsigned char USER2 = memory_alloc(space2);
-    assign(USER2, "USER", TYPE_DIR, ROOT, space2);
+    assign(USER2, "USER", TYPE_DIR, ROOT, fat1, fat2, space2);
     unsigned char JACK2 = memory_alloc(space2);
-    assign(JACK2, "JACK", TYPE_DIR, USER2, space2);
+    assign(JACK2, "JACK", TYPE_DIR, USER2, fat1, fat2, space2);
     unsigned char JOIN2 = memory_alloc(space2);
-    assign(JOIN2, "JOIN", TYPE_DIR, USER2, space2);
+    assign(JOIN2, "JOIN", TYPE_DIR, USER2, fat1, fat2, space2);
     unsigned char LUCY2 = memory_alloc(space2);
-    assign(LUCY2, "LUCY", TYPE_DIR, USER2, space2);
+    assign(LUCY2, "LUCY", TYPE_DIR, USER2, fat1, fat2, space2);
     unsigned char MUSIC2 = memory_alloc(space2);
-    assign(MUSIC2, "MUSIC", TYPE_DIR, JOIN2, space2);
+    assign(MUSIC2, "MUSIC", TYPE_DIR, JOIN2, fat1, fat2, space2);
     unsigned char BOOK2 = memory_alloc(space2);
-    assign(BOOK2, "BOOK", TYPE_DIR, JOIN2, space2);
+    assign(BOOK2, "BOOK", TYPE_DIR, JOIN2, fat1, fat2, space2);
     unsigned char PICTURE2 = memory_alloc(space2);
-    assign(PICTURE2, "PICTURE", TYPE_DIR, JOIN2, space2);
+    assign(PICTURE2, "PICTURE", TYPE_DIR, JOIN2, fat1, fat2, space2);
     unsigned char HOULAI2 = memory_alloc(space2);
-    assign(HOULAI2, "HOULAI.TXT", 0x20, MUSIC2, space2);
+    assign(HOULAI2, "HOULAI.TXT", 0x20, MUSIC2, fat1, fat2, space2);
     unsigned char DRVSPACE2 = memory_alloc(space2);
-    assign(DRVSPACE2, "DRVSPACE.BIN", 0x27, ROOT, space2);
+    assign(DRVSPACE2, "DRVSPACE.BIN", 0x27, ROOT, fat1, fat2, space2);
     puts("space1: ");
     dfs(ROOT, space1, 0);
     puts("space2: ");

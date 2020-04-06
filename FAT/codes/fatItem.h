@@ -37,8 +37,11 @@ unsigned short item_alloc(unsigned char fat1[], unsigned char fat2[])
         modify_next_item(p, 0xFFF, fat1, fat2);
     }
     else {
-    	for (p = 2; next_item(p, fat1); p = next_item(p, fat1))
+    	for (p = 2; p < 2849; next_item(p, fat1), p++)
         	;
+        if (p == 2849) {
+        	return 0xFFF;
+        }
     	modify_next_item(p, 0xFFF, fat1, fat2);
     }
     return p;
