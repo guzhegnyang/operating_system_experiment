@@ -1,5 +1,5 @@
-#include "FatItem.h"
-#include "RootEntry.h"
+#include "fatItem.h"
+#include "rootEntry.h"
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
