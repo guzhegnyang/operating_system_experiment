@@ -393,6 +393,10 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
             puts("Fail saving, space used up");
         }
     }
+    else if (is_command(command, "DEMO"))
+    {
+        demo(fat1, fat2, space);
+    }
     else
     {
         puts("Bad command or file name");

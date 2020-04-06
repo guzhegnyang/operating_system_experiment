@@ -1,4 +1,3 @@
-#include "fat12Header.h"
 void modify_next_item(unsigned short p, unsigned short nxtp, unsigned char fat1[], unsigned char fat2[])
 {
     if (!p % 2)
