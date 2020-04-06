@@ -1,3 +1,4 @@
+#include "fat12Header.h"
 void modify_next_item(unsigned short p, unsigned short nxtp, unsigned char fat1[], unsigned char fat2[])
 {
     if (!p % 2)
@@ -38,7 +39,7 @@ unsigned short item_alloc(unsigned char fat1[], unsigned char fat2[])
     }
     else
     {
-        for (p = 2; p < 2849; next_item(p, fat1), p++)
+        for (p = 2; p < 2849 && next_item(p, fat1); p++)
             ;
         if (p == 2849)
         {

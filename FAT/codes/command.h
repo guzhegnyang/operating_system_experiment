@@ -3,10 +3,10 @@
 #include "ramFDD.h"
 #include <conio.h>
 #define ESC 0x1b
-#define LEFT 37
-#define UP 38
-#define RIGHT 39
-#define DOWN 40
+#define LEFT 75
+#define UP 72
+#define RIGHT 77
+#define DOWN 80
 void read_command(char command[], char parameter[])
 {
     int i;
@@ -339,44 +339,56 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
             return;
         }
         struct OpenFile *fp;
-        if ((fp = open(temp, 'w', active_list, open_list, fat1, space, data)) == NULL)
+        if ((fp = file_open(temp, 'w', active_list, open_list, fat1, space, data)) == NULL)
         {
             puts("Too much files opend");
             return;
         }
         system("cls");
-        read(fp, -1, NULL);
+        file_read(fp, -1, NULL);
         char ch;
-        while ((ch = getch()) != ESC)
+        while (1)
         {
-            if (ch == '\b')
+            ch = getch();
+            if (!ch || ch == -32)
+            {
+                ch = getch();
+                if (ch == LEFT)
+                {
+                    if (!seek(fp, -1, fp->posi))
+                    {
+                        putchar('\a');
+                    }
+                }
+                else if (ch == RIGHT)
+                {
+                    if (!seek(fp, 1, fp->posi))
+                    {
+                        putchar('\a');
+                    }
+                }
+            }
+            else if (ch == '\r')
+            {
+                insert(fp, '\n');
+            }
+            else if (ch == ESC)
+            {
+                system("cls");
+                break;
+            }
+            else if (ch == '\b')
             {
                 erase(fp);
-            }
-            else if (ch == LEFT)
-            {
-                seek(fp, -1, fp->posi);
-            }
-            else if (ch == RIGHT)
-            {
-                seek(fp, 1, fp->posi);
-            }
-            else if (ch == UP)
-            {
-                continue;
-            }
-            else if (ch == DOWN)
-            {
-                continue;
             }
             else
             {
                 insert(fp, ch);
             }
             system("cls");
-            read(fp, -1, NULL);
+            file_read(fp, -1, NULL);
         }
-        if (!close(fp, fat1, fat2, data))
+        if (!file_close(fp, fat1, fat2, data))
         {
             puts("Fail saving, space used up");
         }
