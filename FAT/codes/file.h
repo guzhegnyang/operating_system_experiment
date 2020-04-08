@@ -187,6 +187,10 @@ int file_read(struct OpenFile *fp, int sz, struct FileBuffer *posi)
         if (posi == NULL && p == fp->posi)
         {
             putchar(CURSOR);
+            if (p->value == '\n')
+            {
+                putchar('\n');
+            }
         }
         else
         {
@@ -195,7 +199,7 @@ int file_read(struct OpenFile *fp, int sz, struct FileBuffer *posi)
     }
     return i;
 }
-int file_write(struct OpenFile *fp, unsigned char buf[])
+/*int file_write(struct OpenFile *fp, unsigned char buf[])
 {
     if (fp->read_or_write != WRITE)
     {
@@ -225,9 +229,10 @@ int file_write(struct OpenFile *fp, unsigned char buf[])
             p = p->next;
             free(p->last);
         }
+        free(p);
     }
     return i;
-}
+}*/
 int seek(struct OpenFile *fp, int offset, struct FileBuffer *start)
 {
     struct FileBuffer *posi = start;
@@ -296,4 +301,34 @@ int erase(struct OpenFile *fp)
         }
     }
     return 1;
+}
+int copy(struct OpenFile *fp1, struct OpenFile *fp2)
+{
+    if (fp1->read_or_write != WRITE)
+    {
+        return -1;
+    }
+    int i = 0;
+    struct FileBuffer *p1 = fp1->posi, *p2 = fp2->posi;
+    for (; p2 != NULL; p1 = p1->next, p2 = p2->next, i++)
+    {
+        p1->value = p2->value;
+        if (p1->next == NULL && p2->next != NULL)
+        {
+            p1->next = (struct FileBuffer *)malloc(sizeof(struct FileBuffer));
+            p1->next->last = p1;
+            p1->next->next = NULL;
+        }
+    }
+    if (p1 != NULL)
+    {
+        p1->last->next = NULL;
+        while (p1->next != NULL)
+        {
+            p1 = p1->next;
+            free(p1->last);
+        }
+        free(p1);
+    }
+    return i;
 }

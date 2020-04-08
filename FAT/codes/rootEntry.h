@@ -1,4 +1,5 @@
 #include "fatItem.h"
+#include "string.h"
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -125,7 +126,10 @@ void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsig
     space[node].next_sibling = Null;
     space[node].last_child = Null;
     space[parent].last_child = node;
-    space[space[node].last_sibling].next_sibling = node;
+    if (space[node].last_sibling != Null)
+    {
+        space[space[node].last_sibling].next_sibling = node;
+    }
     if (DIR_Attr == TYPE_DIR)
     {
         if (*(unsigned short *)space[node].DIR_FstClus)
@@ -514,6 +518,14 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
 void demo(unsigned char fat1[], unsigned char fat2[], struct RootEntry space1[])
 {
     init(space1);
+    memset(fat1, 0, 4608);
+    memset(fat2, 0, 4608);
+    fat1[0] = 0xf0;
+    fat1[1] = 0xff;
+    fat1[2] = 0xff;
+    fat2[0] = 0xf0;
+    fat2[1] = 0xff;
+    fat2[2] = 0xff;
     /*unsigned char IO1 = memory_alloc(space1);
     assign(IO1, "IO.SYS", 0x27, ROOT, fat1, fat2, space1);
     unsigned char MSDOS1 = memory_alloc(space1);

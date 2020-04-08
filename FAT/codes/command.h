@@ -103,7 +103,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
 {
     if (is_command(command, "CHECK"))
     {
-        if (check(mbr))
+        if (check(mbr, fat1, fat2))
         {
             puts("Legal");
         }
@@ -338,6 +338,11 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
             puts("File not found");
             return;
         }
+        if (space[temp].DIR_Attr != TYPE_NORMAL_FILE)
+        {
+            puts("Not file");
+            return;
+        }
         struct OpenFile *fp;
         if ((fp = file_open(temp, 'w', active_list, open_list, fat1, space, data)) == NULL)
         {
@@ -392,6 +397,115 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         {
             puts("Fail saving, space used up");
         }
+    }
+    else if (is_command(command, "MOVE"))
+    {
+        unsigned char temp = locate(parameter, *cur_ptr, space);
+        if (temp == Null)
+        {
+            puts("File not found");
+            return;
+        }
+        while (*parameter != ' ')
+        {
+            parameter++;
+        }
+        parameter++;
+        unsigned char temp2 = locate(parameter, *cur_ptr, space);
+        if (space[temp2].DIR_Attr != TYPE_DIR)
+        {
+            puts("Not directory");
+            return;
+        }
+        if (space[space[temp].parent].last_child == temp)
+        {
+            space[space[temp].parent].last_child = space[temp].last_sibling;
+        }
+        if (space[temp].last_sibling != Null)
+        {
+            space[space[temp].last_sibling].next_sibling = space[temp].next_sibling;
+        }
+        if (space[temp].next_sibling != Null)
+        {
+            space[space[temp].next_sibling].last_sibling = space[temp].last_sibling;
+        }
+        space[temp].parent = temp2;
+        space[temp].last_sibling = space[temp2].last_child;
+        space[temp].next_sibling = Null;
+        space[temp2].last_child = temp;
+        if (space[temp].last_sibling != Null)
+        {
+            space[space[temp].last_sibling].next_sibling = temp;
+        }
+    }
+    else if (is_command(command, "FILECPY"))
+    {
+        unsigned char temp = locate(parameter, *cur_ptr, space);
+        if (temp == Null)
+        {
+            puts("File not found");
+            return;
+        }
+        if (space[temp].DIR_Attr != TYPE_NORMAL_FILE)
+        {
+            puts("Not file");
+        }
+        while (*parameter != ' ')
+        {
+            parameter++;
+        }
+        parameter++;
+        unsigned char temp2 = locate(parameter, *cur_ptr, space);
+        struct OpenFile *fp1, *fp2;
+        if (temp2 == Null)
+        {
+            puts("File not found");
+            return;
+        }
+        if (space[temp2].DIR_Attr != TYPE_NORMAL_FILE)
+        {
+            puts("Not file");
+        }
+        fp2 = file_open(temp, 'r', active_list, open_list, fat1, space, data);
+        fp1 = file_open(temp2, 'w', active_list, open_list, fat1, space, data);
+        copy(fp1, fp2);
+        file_close(fp1, fat1, fat2, data);
+        file_close(fp2, fat1, fat2, data);
+    }
+    else if (is_command(command, "FILECAT"))
+    {
+        unsigned char temp = locate(parameter, *cur_ptr, space);
+        if (temp == Null)
+        {
+            puts("File not found");
+            return;
+        }
+        if (space[temp].DIR_Attr != TYPE_NORMAL_FILE)
+        {
+            puts("Not file");
+        }
+        while (*parameter != ' ')
+        {
+            parameter++;
+        }
+        parameter++;
+        unsigned char temp2 = locate(parameter, *cur_ptr, space);
+        struct OpenFile *fp1, *fp2;
+        if (temp2 == Null)
+        {
+            puts("File not found");
+            return;
+        }
+        if (space[temp2].DIR_Attr != TYPE_NORMAL_FILE)
+        {
+            puts("Not file");
+        }
+        fp2 = file_open(temp, 'r', active_list, open_list, fat1, space, data);
+        fp1 = file_open(temp2, 'w', active_list, open_list, fat1, space, data);
+        seek(fp1, *(int *)fp1->af->dir->DIR_FileSize, fp1->posi);
+        copy(fp1, fp2);
+        file_close(fp1, fat1, fat2, data);
+        file_close(fp2, fat1, fat2, data);
     }
     else if (is_command(command, "DEMO"))
     {

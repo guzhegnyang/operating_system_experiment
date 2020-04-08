@@ -20,7 +20,7 @@ struct Fat12Header
     char BS_VolLab[11];
     char BS_FileSysType[8];
 };
-int check(unsigned char mbr[])
+int check(unsigned char mbr[], unsigned char fat1[], unsigned char fat2[])
 {
     struct Fat12Header *p = (struct Fat12Header *)(mbr + 3);
     if ((*(unsigned short *)(p->BPB_BytsPerSec)) != 512)
@@ -55,6 +55,17 @@ int check(unsigned char mbr[])
     for (int i = 0; i < 8; i++)
     {
         if (p->BS_FileSysType[i] != FileSysType[i])
+        {
+            return 0;
+        }
+    }
+    if (fat1[0] != 0xf0 || fat1[1] != 0xff || fat1[2] != 0xff)
+    {
+        return 0;
+    }
+    for (int i = 0; i < 4608; i++)
+    {
+        if (fat1[i] != fat2[i])
         {
             return 0;
         }

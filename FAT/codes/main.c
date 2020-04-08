@@ -7,7 +7,7 @@ char command[10];
 char parameter[100];
 int main()
 {
-    init_ramFDD144(ramFDD144, "../fdd144.img");
+    init_ramFDD144(ramFDD144, "../18308045PC/fdd144.img");
     struct RootEntry *space = (struct RootEntry *)(ramFDD144 + 9728);
     unsigned char *data = (unsigned char *)(ramFDD144 + 16896);
     while (1)
@@ -17,6 +17,7 @@ int main()
         read_command(command, parameter);
         if (is_command(command, "EXIT"))
         {
+            write_ramFDD144(ramFDD144, "../18308045PC/fdd144.img");
             break;
         }
         if (is_command(command, "CLS"))
