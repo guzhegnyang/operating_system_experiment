@@ -1,10 +1,10 @@
 # Details
 
-Date : 2020-04-08 18:54:15
+Date : 2020-04-08 19:18:54
 
 Directory f:\谷正阳\代码\操作系统实验\FAT\codes
 
-Total : 9 files,  1565 codes, 102 comments, 0 blanks, all 1667 lines
+Total : 9 files,  1574 codes, 102 comments, 0 blanks, all 1676 lines
 
 [summary](results.md)
 
@@ -19,6 +19,6 @@ Total : 9 files,  1565 codes, 102 comments, 0 blanks, all 1667 lines
 | [file.h](/file.h) | C++ | 300 | 34 | 0 | 334 |
 | [main.c](/main.c) | C | 30 | 2 | 0 | 32 |
 | [ramFDD.h](/ramFDD.h) | C++ | 15 | 16 | 0 | 31 |
-| [rootEntry.h](/rootEntry.h) | C++ | 534 | 50 | 0 | 584 |
+| [rootEntry.h](/rootEntry.h) | C++ | 543 | 50 | 0 | 593 |
 
 [summary](results.md)
