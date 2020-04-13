@@ -26,14 +26,13 @@ unsigned short next_item(unsigned short p, unsigned char fat[])
         return *(unsigned short *)(fat + (unsigned short)(p * 1.5)) >> 4;
     }
 }
-unsigned short item_top = 0xFFF;
-unsigned short item_alloc(unsigned char fat1[], unsigned char fat2[])
+unsigned short item_alloc(unsigned char fat1[], unsigned char fat2[], unsigned short *item_top_p)
 {
     unsigned short p;
-    if (item_top != 0xFFF)
+    if (*item_top_p != 0xFFF)
     {
-        p = item_top;
-        item_top = next_item(item_top, fat1);
+        p = *item_top_p;
+        *item_top_p = next_item(*item_top_p, fat1);
         modify_next_item(p, 0xFFF, fat1, fat2);
     }
     else
@@ -48,7 +47,7 @@ unsigned short item_alloc(unsigned char fat1[], unsigned char fat2[])
     }
     return p;
 }
-void item_delete(unsigned short DIR_FstClus, unsigned char fat1[], unsigned char fat2[])
+void item_delete(unsigned short DIR_FstClus, unsigned char fat1[], unsigned char fat2[], unsigned short *item_top_p)
 {
     unsigned short p = DIR_FstClus, nxtp;
     p = next_item(DIR_FstClus, fat1);
@@ -62,6 +61,6 @@ void item_delete(unsigned short DIR_FstClus, unsigned char fat1[], unsigned char
         p = nxtp;
         nxtp = next_item(nxtp, fat1);
     }
-    modify_next_item(p, item_top, fat1, fat2);
-    item_top = next_item(DIR_FstClus, fat1);
+    modify_next_item(p, *item_top_p, fat1, fat2);
+    *item_top_p = next_item(DIR_FstClus, fat1);
 }

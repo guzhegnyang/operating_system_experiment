@@ -123,7 +123,7 @@ struct OpenFile *file_open(unsigned char uid, char opt, struct ActiveFile active
     open_list[i].af = active_list + j;
     return open_list + i;
 }
-int file_close(struct OpenFile *fp, unsigned char fat1[], unsigned char fat2[], unsigned char data[])
+int file_close(struct OpenFile *fp, unsigned char fat1[], unsigned char fat2[], unsigned char data[], unsigned short *item_top_p)
 {
     fp->af->share_counter--;
     if (!fp->af->share_counter)
@@ -146,7 +146,7 @@ int file_close(struct OpenFile *fp, unsigned char fat1[], unsigned char fat2[], 
                     clus = next_item(clus, fat1);
                     if (clus == 0xFFF)
                     {
-                        clus = item_alloc(fat1, fat2);
+                        clus = item_alloc(fat1, fat2, item_top_p);
                         if (clus == 0xFFF)
                         {
                             return 0;
@@ -162,7 +162,7 @@ int file_close(struct OpenFile *fp, unsigned char fat1[], unsigned char fat2[], 
         free(p);
         if (next_item(clus, fat1) != 0xFFF)
         {
-            item_delete(clus, fat1, fat2);
+            item_delete(clus, fat1, fat2, item_top_p);
             modify_next_item(clus, 0xFFF, fat1, fat2);
         }
         *(unsigned int *)fp->af->dir->DIR_FileSize = sz;

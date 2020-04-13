@@ -116,7 +116,8 @@ void init(struct RootEntry space[])
     store_name(space[ROOT].DIR_Name, "ROOT");
     space[ROOT].DIR_Attr = TYPE_DIR;
 }
-void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsigned char parent, unsigned char fat1[], unsigned char fat2[], struct RootEntry space[])
+void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsigned char parent,
+            unsigned char fat1[], unsigned char fat2[], struct RootEntry space[], unsigned short *item_top_p)
 {
     store_date_time((unsigned short *)space[node].DIR_WrtDate, (unsigned short *)space[node].DIR_WrtTime);
     store_name(space[node].DIR_Name, name);
@@ -146,7 +147,7 @@ void assign(unsigned char node, const char name[], unsigned char DIR_Attr, unsig
         }
         else
         {
-            *(unsigned short *)space[node].DIR_FstClus = item_alloc(fat1, fat2);
+            *(unsigned short *)space[node].DIR_FstClus = item_alloc(fat1, fat2, item_top_p);
         }
     }
     *(unsigned int *)space[node].DIR_FileSize = 0;
@@ -515,7 +516,7 @@ unsigned char locate(char path[], unsigned char cur, struct RootEntry space[])
     }
     return p;
 }
-void demo(unsigned char fat1[], unsigned char fat2[], struct RootEntry space1[])
+void demo(unsigned char fat1[], unsigned char fat2[], struct RootEntry space1[], unsigned short *item_top_p)
 {
     init(space1);
     memset(fat1, 0, 4608);
@@ -527,67 +528,67 @@ void demo(unsigned char fat1[], unsigned char fat2[], struct RootEntry space1[])
     fat2[1] = 0xff;
     fat2[2] = 0xff;
     /*unsigned char IO1 = memory_alloc(space1);
-    assign(IO1, "IO.SYS", 0x27, ROOT, fat1, fat2, space1);
+    assign(IO1, "IO.SYS", 0x27, ROOT, fat1, fat2, space1, item_top_p);
     unsigned char MSDOS1 = memory_alloc(space1);
-    assign(MSDOS1, "MSDOS.SYS", 0x27, ROOT, fat1, fat2, space1);
+    assign(MSDOS1, "MSDOS.SYS", 0x27, ROOT, fat1, fat2, space1, item_top_p);
     unsigned char COMMAND1 = memory_alloc(space1);
-    assign(COMMAND1, "COMMAND.COM", 0x20, ROOT, fat1, fat2, space1);
+    assign(COMMAND1, "COMMAND.COM", 0x20, ROOT, fat1, fat2, space1, item_top_p);
     unsigned char DRVSPACE1 = memory_alloc(space1);
-    assign(DRVSPACE1, "DRVSPACE.BIN", 0x27, ROOT, fat1, fat2, space1);*/
+    assign(DRVSPACE1, "DRVSPACE.BIN", 0x27, ROOT, fat1, fat2, space1, item_top_p);*/
     unsigned char USER1 = memory_alloc(space1);
-    assign(USER1, "USER", TYPE_DIR, ROOT, fat1, fat2, space1);
+    assign(USER1, "USER", TYPE_DIR, ROOT, fat1, fat2, space1, item_top_p);
     unsigned char JOIN1 = memory_alloc(space1);
-    assign(JOIN1, "JOIN", TYPE_DIR, USER1, fat1, fat2, space1);
+    assign(JOIN1, "JOIN", TYPE_DIR, USER1, fat1, fat2, space1, item_top_p);
     unsigned char JACK1 = memory_alloc(space1);
-    assign(JACK1, "JACK", TYPE_DIR, USER1, fat1, fat2, space1);
+    assign(JACK1, "JACK", TYPE_DIR, USER1, fat1, fat2, space1, item_top_p);
     unsigned char LUCY1 = memory_alloc(space1);
-    assign(LUCY1, "LUCY", TYPE_DIR, USER1, fat1, fat2, space1);
+    assign(LUCY1, "LUCY", TYPE_DIR, USER1, fat1, fat2, space1, item_top_p);
     unsigned char MUSIC1 = memory_alloc(space1);
-    assign(MUSIC1, "MUSIC", TYPE_DIR, JOIN1, fat1, fat2, space1);
+    assign(MUSIC1, "MUSIC", TYPE_DIR, JOIN1, fat1, fat2, space1, item_top_p);
     unsigned char PICTURE1 = memory_alloc(space1);
-    assign(PICTURE1, "PICTURE", TYPE_DIR, JOIN1, fat1, fat2, space1);
+    assign(PICTURE1, "PICTURE", TYPE_DIR, JOIN1, fat1, fat2, space1, item_top_p);
     unsigned char BOOK1 = memory_alloc(space1);
-    assign(BOOK1, "BOOK", TYPE_DIR, JOIN1, fat1, fat2, space1);
+    assign(BOOK1, "BOOK", TYPE_DIR, JOIN1, fat1, fat2, space1, item_top_p);
     /*unsigned char HOULAI1 = memory_alloc(space1);
-    assign(HOULAI1, "HOULAI.TXT", 0x20, MUSIC1, fat1, fat2, space1);
+    assign(HOULAI1, "HOULAI.TXT", 0x20, MUSIC1, fat1, fat2, space1, item_top_p);
     init(space2);
     unsigned char COMMAND2 = memory_alloc(space2);
-    assign(COMMAND2, "COMMAND.COM", 0x20, ROOT, fat1, fat2, space2);
+    assign(COMMAND2, "COMMAND.COM", 0x20, ROOT, fat1, fat2, space2, item_top_p);
     unsigned char IO2 = memory_alloc(space2);
-    assign(IO2, "IO.SYS", 0x27, ROOT, fat1, fat2, space2);
+    assign(IO2, "IO.SYS", 0x27, ROOT, fat1, fat2, space2, item_top_p);
     unsigned char MSDOS2 = memory_alloc(space2);
-    assign(MSDOS2, "MSDOS.SYS", 0x27, ROOT, fat1, fat2, space2);
+    assign(MSDOS2, "MSDOS.SYS", 0x27, ROOT, fat1, fat2, space2, item_top_p);
     unsigned char USER2 = memory_alloc(space2);
-    assign(USER2, "USER", TYPE_DIR, ROOT, fat1, fat2, space2);
+    assign(USER2, "USER", TYPE_DIR, ROOT, fat1, fat2, space2, item_top_p);
     unsigned char JACK2 = memory_alloc(space2);
-    assign(JACK2, "JACK", TYPE_DIR, USER2, fat1, fat2, space2);
+    assign(JACK2, "JACK", TYPE_DIR, USER2, fat1, fat2, space2, item_top_p);
     unsigned char JOIN2 = memory_alloc(space2);
-    assign(JOIN2, "JOIN", TYPE_DIR, USER2, fat1, fat2, space2);
+    assign(JOIN2, "JOIN", TYPE_DIR, USER2, fat1, fat2, space2, item_top_p);
     unsigned char LUCY2 = memory_alloc(space2);
-    assign(LUCY2, "LUCY", TYPE_DIR, USER2, fat1, fat2, space2);
+    assign(LUCY2, "LUCY", TYPE_DIR, USER2, fat1, fat2, space2, item_top_p);
     unsigned char MUSIC2 = memory_alloc(space2);
-    assign(MUSIC2, "MUSIC", TYPE_DIR, JOIN2, fat1, fat2, space2);
+    assign(MUSIC2, "MUSIC", TYPE_DIR, JOIN2, fat1, fat2, space2, item_top_p);
     unsigned char BOOK2 = memory_alloc(space2);
-    assign(BOOK2, "BOOK", TYPE_DIR, JOIN2, fat1, fat2, space2);
+    assign(BOOK2, "BOOK", TYPE_DIR, JOIN2, fat1, fat2, space2, item_top_p);
     unsigned char PICTURE2 = memory_alloc(space2);
-    assign(PICTURE2, "PICTURE", TYPE_DIR, JOIN2, fat1, fat2, space2);
+    assign(PICTURE2, "PICTURE", TYPE_DIR, JOIN2, fat1, fat2, space2, item_top_p);
     unsigned char HOULAI2 = memory_alloc(space2);
-    assign(HOULAI2, "HOULAI.TXT", 0x20, MUSIC2, fat1, fat2, space2);
+    assign(HOULAI2, "HOULAI.TXT", 0x20, MUSIC2, fat1, fat2, space2, item_top_p);
     unsigned char DRVSPACE2 = memory_alloc(space2);
-    assign(DRVSPACE2, "DRVSPACE.BIN", 0x27, ROOT, fat1, fat2, space2);
+    assign(DRVSPACE2, "DRVSPACE.BIN", 0x27, ROOT, fat1, fat2, space2, item_top_p);
     puts("space1: ");
     dfs(ROOT, space1, 0);
     puts("space2: ");
     dfs(ROOT, space2, 0);
-    printf("h:\t%d\n", height(ROOT, space1));
-    printf("file:\t%d\n", count_file(ROOT, space1));
+    printf("h:\t%d\n", height(ROOT, space1, item_top_p));
+    printf("file:\t%d\n", count_file(ROOT, space1, item_top_p));
     printf("isomorphy:\t%d\n", isomorphy(ROOT, ROOT, space1, space2));
-    delete_tree(JOIN1, space1);
+    delete_tree(JOIN1, space1, item_top_p);
     puts("space1: ");
     dfs(ROOT, space1, 0);
     puts("space2: ");
     dfs(ROOT, space2, 0);
-    printf("h:\t%d\n", height(ROOT, space1));
-    printf("file:\t%d\n", count_file(ROOT, space1));
+    printf("h:\t%d\n", height(ROOT, space1, item_top_p));
+    printf("file:\t%d\n", count_file(ROOT, space1, item_top_p));
     printf("isomorphy:\t%d\n", isomorphy(ROOT, ROOT, space1, space2));*/
 }

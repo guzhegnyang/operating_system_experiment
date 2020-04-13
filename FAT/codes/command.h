@@ -99,7 +99,8 @@ int check_name(char *name)
     return 1;
 }
 void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
-                     unsigned char mbr[], unsigned char fat1[], unsigned char fat2[], struct RootEntry space[], unsigned char data[], struct ActiveFile active_list[], struct OpenFile open_list[])
+                     unsigned char mbr[], unsigned char fat1[], unsigned char fat2[], struct RootEntry space[], unsigned char data[],
+                     struct ActiveFile active_list[], struct OpenFile open_list[], unsigned short *item_top_p)
 {
     if (is_command(command, "CHECK"))
     {
@@ -179,7 +180,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
             }
             else
             {
-                assign(file, file_name, TYPE_NORMAL_FILE, temp, fat1, fat2, space);
+                assign(file, file_name, TYPE_NORMAL_FILE, temp, fat1, fat2, space, item_top_p);
             }
         }
     }
@@ -230,7 +231,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         }
         else
         {
-            assign(file, file_name, TYPE_DIR, temp, fat1, fat2, space);
+            assign(file, file_name, TYPE_DIR, temp, fat1, fat2, space, item_top_p);
         }
     }
     else if (is_command(command, "RD"))
@@ -286,13 +287,13 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
                             break;
                         }
                         memory_delete(p, space);
-                        item_delete(*(unsigned short *)space[p].DIR_FstClus, fat1, fat2);
+                        item_delete(*(unsigned short *)space[p].DIR_FstClus, fat1, fat2, item_top_p);
                         for (; p != Null; p = space[p].last_sibling)
                         {
                             if (space[p].DIR_Attr != TYPE_DIR)
                             {
                                 memory_delete(p, space);
-                                item_delete(*(unsigned short *)space[p].DIR_FstClus, fat1, fat2);
+                                item_delete(*(unsigned short *)space[p].DIR_FstClus, fat1, fat2, item_top_p);
                             }
                         }
                         break;
@@ -305,7 +306,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
             }
             else
             {
-                item_delete(*(unsigned short *)space[temp].DIR_FstClus, fat1, fat2);
+                item_delete(*(unsigned short *)space[temp].DIR_FstClus, fat1, fat2, item_top_p);
                 memory_delete(temp, space);
             }
         }
@@ -393,7 +394,7 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
             system("cls");
             file_read(fp, -1, NULL);
         }
-        if (!file_close(fp, fat1, fat2, data))
+        if (!file_close(fp, fat1, fat2, data, item_top_p))
         {
             puts("Fail saving, space used up");
         }
@@ -469,8 +470,8 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         fp2 = file_open(temp, 'r', active_list, open_list, fat1, space, data);
         fp1 = file_open(temp2, 'w', active_list, open_list, fat1, space, data);
         copy(fp1, fp2);
-        file_close(fp1, fat1, fat2, data);
-        file_close(fp2, fat1, fat2, data);
+        file_close(fp1, fat1, fat2, data, item_top_p);
+        file_close(fp2, fat1, fat2, data, item_top_p);
     }
     else if (is_command(command, "FILECAT"))
     {
@@ -504,12 +505,12 @@ void execute_command(char command[], char parameter[], unsigned char *cur_ptr,
         fp1 = file_open(temp2, 'w', active_list, open_list, fat1, space, data);
         seek(fp1, *(int *)fp1->af->dir->DIR_FileSize, fp1->posi);
         copy(fp1, fp2);
-        file_close(fp1, fat1, fat2, data);
-        file_close(fp2, fat1, fat2, data);
+        file_close(fp1, fat1, fat2, data, item_top_p);
+        file_close(fp2, fat1, fat2, data, item_top_p);
     }
     else if (is_command(command, "DEMO"))
     {
-        demo(fat1, fat2, space);
+        demo(fat1, fat2, space, item_top_p);
     }
     else
     {
