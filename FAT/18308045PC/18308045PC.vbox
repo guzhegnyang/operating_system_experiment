@@ -6,7 +6,7 @@
 ** Use VBoxManage or the VirtualBox Manager GUI to make changes.
 -->
 <VirtualBox xmlns="http://www.virtualbox.org/" version="1.15-windows">
-  <Machine uuid="{6140d208-bdf0-4563-ac56-65a35bb942fd}" name="18308045PC" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-04-22T04:56:59Z">
+  <Machine uuid="{6140d208-bdf0-4563-ac56-65a35bb942fd}" name="18308045PC" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-04-27T05:42:09Z">
     <MediaRegistry>
       <HardDisks>
         <HardDisk uuid="{bcbb39ab-df21-4bc9-a746-6d25998b71fc}" location="18308045PC.vdi" format="VDI" type="Normal"/>
@@ -20,7 +20,7 @@
     </MediaRegistry>
     <ExtraData>
       <ExtraDataItem name="GUI/LastCloseAction" value="PowerOff"/>
-      <ExtraDataItem name="GUI/LastNormalWindowPosition" value="708,221,320,283"/>
+      <ExtraDataItem name="GUI/LastNormalWindowPosition" value="708,221,720,451"/>
     </ExtraData>
     <Hardware>
       <CPU>
@@ -39,14 +39,21 @@
       <Display VRAMSize="1"/>
       <VideoCapture screens="1" file="." fps="25"/>
       <RemoteDisplay enabled="false"/>
+      <BIOS>
+        <SmbiosUuidLittleEndian enabled="true"/>
+      </BIOS>
       <Network>
         <Adapter slot="0" MACAddress="080027786294" cable="true" type="Am79C973">
           <NAT/>
         </Adapter>
       </Network>
+      <UART>
+        <Port slot="0" enabled="true" IOBase="0x3f8" IRQ="4" hostMode="Disconnected"/>
+      </UART>
       <AudioAdapter controller="SB16" driver="DirectSound" enabled="false" enabledIn="false"/>
+      <Clipboard/>
       <GuestProperties>
-        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1587531420524325700" flags=""/>
+        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1587966130296955500" flags=""/>
       </GuestProperties>
     </Hardware>
     <StorageControllers>
