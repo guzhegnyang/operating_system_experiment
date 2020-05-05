@@ -1,0 +1,218 @@
+     1                                  ; 程序源代码（myos1.asm）
+     2                                  org  7c00h
+     3                                  ; org  100h
+     4                                  ; org 0h
+     5                                  
+     6                                  ; BIOS将把引导扇区加载到0:7C00h处，并开始执行
+     7                                  OffSetOfUserPrg1 equ 8100h
+     8                                  LEFT equ 0x4b00
+     9                                  RIGHT equ 0x4d00
+    10                                  UP equ 0x4800
+    11                                  DOWN equ 0x5000
+    12                                  Cls:
+    13 00000000 B406                        mov ah,6
+    14 00000002 B000                        mov al,0
+    15 00000004 B90000                      mov cx,0
+    16 00000007 BAFFFF                      mov dx,0xffff
+    17 0000000A CD10                        int 10h                     ; cls
+    18                                  
+    19                                  Start:
+    20 0000000C B80000                      mov ax, 0
+    21 0000000F 8ED0                        mov ss, ax
+    22 00000011 BC007C                      mov sp, 0x7c00
+    23 00000014 8CC8                        mov	ax, cs                  ; 置其他段寄存器值与CS相同
+    24 00000016 8ED8                        mov	ds, ax                  ; 数据段
+    25 00000018 BD[6001]                    mov	bp, Message             ; BP=当前串的偏移地址
+    26 0000001B 8CD8                        mov	ax, ds                  ; ES:BP = 串地址
+    27 0000001D 8EC0                        mov	es, ax                  ; 置ES=DS
+    28 0000001F B91E00                      mov	cx, MessageLength       ; CX = 串长
+    29 00000022 B80113                      mov	ax, 1301h               ; AH = 13h（功能号）、AL = 01h（光标置于尾）
+    30 00000025 BB0700                      mov	bx, 0007h               ; 页号为0(BH = 0) 黑底白字(BL = 07h)
+    31 00000028 B600                        mov dh, 0                   ; 行号=0
+    32 0000002A B200                        mov	dl, 0                   ; 列号=0
+    33 0000002C CD10                        int	10h                     ; BIOS的10h功能：显示一行字符
+    34                                  
+    35 0000002E BE[8001]                    mov si, Order               ; 数组中光标位置
+    36 00000031 B21E                        mov dl, MessageLength       ; 光标位置
+    37 00000033 BF[8001]                	mov di, Order
+    38 00000036 033E[7E01]              	add di, [Len]
+    39                                  
+    40                                  Dump:
+    41 0000003A 39FE                    	cmp si, di
+    42 0000003C 7411                    	jz Input
+    43 0000003E 8A04                    	mov al,byte[si]
+    44 00000040 B409                        mov ah,9                    ; 功能号
+    45 00000042 B90100                      mov cx,1                    ; 重复次数
+    46 00000045 CD10                        int 10h                     ; 打印字符
+    47 00000047 46                      	inc si
+    48 00000048 42                      	inc dx
+    49 00000049 B402                    	mov ah, 2
+    50                                      ; mov bh,0
+    51 0000004B CD10                        int 10h                     ; 移动光标
+    52 0000004D EBEB                    	jmp Dump
+    53                                  
+    54                                  Input:
+    55 0000004F B400                        mov ah,0
+    56 00000051 CD16                        int 16h
+    57 00000053 3C0D                        cmp al,0x0d                 ; '/r'
+    58 00000055 0F84D000                    jz Load
+    59                                  
+    60 00000059 3C41                        cmp al,'A'
+    61 0000005B 746C                        jz ABCD
+    62 0000005D 3C42                        cmp al,'B'
+    63 0000005F 7468                        jz ABCD
+    64 00000061 3C43                        cmp al,'C'
+    65 00000063 7464                        jz ABCD
+    66 00000065 3C44                        cmp al,'D'
+    67 00000067 7460                        jz ABCD
+    68                                  
+    69 00000069 3C08                        cmp al,0x08					; '/b'
+    70 0000006B 741A                        jz BackSpace
+    71                                  
+    72 0000006D 3D004B                      cmp ax,LEFT
+    73 00000070 7449                        jz Left
+    74 00000072 3D004D                      cmp ax,RIGHT
+    75 00000075 747A                        jz Right
+    76 00000077 3D0048                      cmp ax,UP
+    77 0000007A 0F848900                    jz Up
+    78 0000007E 3D0050                      cmp ax,DOWN
+    79 00000081 0F848F00                    jz Down
+    80                                  
+    81 00000085 EBC8                        jmp Input
+    82                                  
+    83                                  BackSpace:
+    84 00000087 81FE[8001]                  cmp si, Order
+    85 0000008B 74C2                        jz Input                    ; 如果到最左，则无效
+    86 0000008D 52                          push dx
+    87 0000008E 56                          push si
+    88 0000008F BF[8001]                    mov di,Order
+    89 00000092 033E[7E01]                  add di,[Len]                ; di=数组尾
+    90                                  Erase:
+    91 00000096 8A04                        mov al, byte[si]
+    92 00000098 4E                          dec si
+    93 00000099 4A                          dec dx
+    94 0000009A B402                        mov ah, 2
+    95                                      ; mov bh,0
+    96 0000009C CD10                        int 10h                     ; 移动光标
+    97 0000009E 8804                        mov byte[si],al
+    98 000000A0 B409                        mov ah,9                    ; 功能号
+    99 000000A2 B90100                      mov cx,1                    ; 重复次数
+   100 000000A5 CD10                        int 10h                     ; 打印字符
+   101                                  
+   102 000000A7 83C602                      add si, 2
+   103 000000AA 83C202                      add dx, 2
+   104 000000AD B402                        mov ah, 2
+   105                                      ; mov bh,0
+   106 000000AF CD10                        int 10h                     ; 移动光标
+   107 000000B1 39F7                        cmp di, si
+   108 000000B3 79E1                        jns Erase
+   109                                  BackSpaceReturn:
+   110 000000B5 FF0E[7E01]                  dec	word[Len]
+   111 000000B9 5E                          pop si
+   112 000000BA 5A                          pop dx                      ; BackSpace后接着Left
+   113                                  Left:
+   114 000000BB 81FE[8001]                  cmp si, Order
+   115 000000BF 748E                        jz Input                    ; 如果到最左，则无效
+   116 000000C1 4E                          dec si
+   117 000000C2 4A                          dec dx                      ; 行号dh，列号dl
+   118 000000C3 B402                        mov ah, 2
+   119                                      ; mov bh,0
+   120 000000C5 CD10                        int 10h                     ; 左移一位光标
+   121 000000C7 EB86                        jmp Input
+   122                                  ABCD:
+   123 000000C9 52                          push dx
+   124 000000CA 56                          push si                     ; 暂存
+   125 000000CB BF[8001]                    mov di,Order
+   126 000000CE FF06[7E01]                  inc word[Len]
+   127 000000D2 033E[7E01]                  add di,[Len]                ; di=数组尾
+   128                                  Insert:
+   129 000000D6 39FE                        cmp si,di
+   130 000000D8 7415                        jz InsertReturn
+   131 000000DA 8A0C                        mov cl, byte[si]
+   132 000000DC 51                          push cx
+   133 000000DD 8804                        mov [si],al
+   134 000000DF B409                        mov ah,9                    ; 功能号
+   135 000000E1 B90100                      mov cx,1                    ; 重复次数
+   136 000000E4 CD10                        int 10h                     ; 打印字符
+   137                                  
+   138 000000E6 58                          pop ax
+   139 000000E7 46                          inc si
+   140 000000E8 42                          inc dx
+   141 000000E9 B402                        mov ah,2
+   142                                      ; mov bh,0
+   143 000000EB CD10                        int 10h                     ; 移动光标
+   144                                  
+   145 000000ED EBE7                        jmp Insert
+   146                                  InsertReturn:
+   147 000000EF 5E                          pop si
+   148 000000F0 5A                          pop dx                      ; Insert后接着Right
+   149                                  Right:
+   150 000000F1 BF[8001]                    mov di,Order
+   151 000000F4 033E[7E01]                  add di,[Len]                ; di=数组尾
+   152 000000F8 39FE                        cmp si,di
+   153 000000FA 0F8451FF                    jz Input                    ; 如果到最右，则无效
+   154 000000FE 46                          inc si
+   155 000000FF 42                          inc dx                      ; 行号dh，列号dl
+   156 00000100 B402                        mov ah, 2
+   157                                      ; mov bh,0
+   158 00000102 CD10                        int 10h                     ; 右移一位光标
+   159 00000104 E948FF                      jmp Input
+   160                                  
+   161                                  Up:
+   162 00000107 BE[8001]                    mov si, Order
+   163 0000010A BA1E00                      mov dx, MessageLength       ; 行号dh，列号dl
+   164 0000010D B402                        mov ah, 2
+   165                                      ; mov bh,0
+   166 0000010F CD10                        int 10h                     ; 左移至头光标
+   167 00000111 E93BFF                      jmp Input
+   168                                  Down:
+   169 00000114 BE[8001]                    mov si, Order
+   170 00000117 0336[7E01]                  add si, [Len]
+   171 0000011B BA1E00                      mov dx, MessageLength
+   172 0000011E 0316[7E01]                  add dx, [Len]               ; 行号dh，列号dl
+   173 00000122 B402                        mov ah, 2
+   174                                      ; mov bh,0
+   175 00000124 CD10                        int 10h                     ; 右移至尾光标
+   176 00000126 E926FF                      jmp Input
+   177                                  
+   178                                  Load:
+   179 00000129 BE[8001]                    mov si, Order
+   180 0000012C BF[8001]                	mov di, Order
+   181 0000012F 033E[7E01]              	add di, [Len]
+   182                                  
+   183                                  LoadnEx:
+   184                                      ; 读软盘或硬盘上的若干物理扇区到内存的ES:BX处：
+   185 00000133 39FE                        cmp si, di
+   186 00000135 0F84C7FE                    jz Cls                      ; 执行完成，从头开始
+   187 00000139 8A0C                    	mov cl,byte[si]		        ; 起始扇区号 ; 起始编号为1
+   188 0000013B 80E93F                      sub cl,0x3f                 ; 映射'A'->2, 'B'->3, 'C'->4, 'D'->5
+   189 0000013E 8CC8                        mov ax,cs                   ; 段地址 ; 存放数据的内存基地址
+   190 00000140 8EC0                        mov es,ax                   ; 设置段地址（不能直接mov es,段地址）
+   191 00000142 BB0081                      mov bx, OffSetOfUserPrg1    ; 偏移地址; 存放数据的内存偏移地址
+   192 00000145 B402                        mov ah,2                    ; 功能号
+   193 00000147 B001                        mov al,1                    ; 扇区数
+   194 00000149 B200                        mov dl,0                    ; 驱动器号 ; 软盘为0，硬盘和U盘为80H
+   195 0000014B B600                        mov dh,0                    ; 磁头号 ; 起始编号为0
+   196 0000014D B500                        mov ch,0                    ; 柱面号 ; 起始编号为0
+   197                                  
+   198 0000014F CD13                        int 13H                     ; 调用读磁盘BIOS的13h功能
+   199                                                                  ; 用户程序a.com已加载到指定内存区域中
+   200 00000151 9A00010008                  call 800h:100h
+   201 00000156 B80000                  	mov ax, 0
+   202 00000159 8ED8                    	mov ds,ax
+   203 0000015B 8EC0                        mov es,ax                   ; 设置段地址（不能直接mov es,段地址）
+   204 0000015D 46                      	inc si
+   205 0000015E EBD3                    	jmp LoadnEx
+   206                                  
+   207                                  Message:
+   208 00000160 496E70757420616E20-         db 'Input an order and hit Enter: '
+   208 00000169 6F7264657220616E64-
+   208 00000172 2068697420456E7465-
+   208 0000017B 723A20             
+   209                                  MessageLength  equ ($-Message)
+   210                                  Len:
+   211 0000017E 0000                        dw 0
+   212                                  Order:
+   213 00000180 00<rept>                    times 510-($-$$) db 0
+   214 000001FE 55AA                        db 0x55,0xaa
+   215                                  
