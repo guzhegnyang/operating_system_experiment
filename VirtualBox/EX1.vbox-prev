@@ -6,7 +6,7 @@
 ** Use VBoxManage or the VirtualBox Manager GUI to make changes.
 -->
 <VirtualBox xmlns="http://www.virtualbox.org/" version="1.15-windows">
-  <Machine uuid="{aa7c4408-cd2e-45a6-aef3-d9f0073e94e2}" name="EX1" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-05-05T17:24:52Z">
+  <Machine uuid="{aa7c4408-cd2e-45a6-aef3-d9f0073e94e2}" name="EX1" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-05-06T11:31:17Z">
     <MediaRegistry>
       <FloppyImages>
         <Image uuid="{ddca92be-5d47-4ae0-b53c-bb37f0f214e3}" location="EX1_2.img"/>
@@ -16,6 +16,7 @@
         <Image uuid="{574a90d9-374e-49b5-bdbd-ce4868dcce28}" location="C:/Users/guzy0/Desktop/dbg/a.img"/>
         <Image uuid="{b59d5194-421f-4c0f-8a33-d698e1d45850}" location="C:/Users/guzy0/Desktop/dbg/EX2.img"/>
         <Image uuid="{8c7f5aff-01ad-4541-ab18-502a9dc37e00}" location="C:/Users/guzy0/Desktop/dbg/14348086_&#x5218;&#x6613;&#x6797;_os lab1/t.img"/>
+        <Image uuid="{0e683657-5f62-47d8-b983-7bfd98b8721c}" location="C:/Users/guzy0/Documents/WeChat Files/gudongzhaoqd/FileStorage/File/2020-05/stone.img"/>
       </FloppyImages>
     </MediaRegistry>
     <ExtraData>
@@ -47,13 +48,13 @@
       <AudioAdapter controller="SB16" driver="DirectSound" enabled="true" enabledIn="false"/>
       <Clipboard/>
       <GuestProperties>
-        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1588698937973911200" flags=""/>
+        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1588763091972727800" flags="RDONLYGUEST"/>
       </GuestProperties>
     </Hardware>
     <StorageControllers>
       <StorageController name="Floppy" type="I82078" PortCount="1" useHostIOCache="true" Bootable="true">
         <AttachedDevice type="Floppy" hotpluggable="false" port="0" device="0">
-          <Image uuid="{b59d5194-421f-4c0f-8a33-d698e1d45850}"/>
+          <Image uuid="{0e683657-5f62-47d8-b983-7bfd98b8721c}"/>
         </AttachedDevice>
       </StorageController>
       <StorageController name="IDE" type="PIIX4" PortCount="2" useHostIOCache="true" Bootable="true">
