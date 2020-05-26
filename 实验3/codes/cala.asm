@@ -10,11 +10,18 @@ _start:
     mov ax, cs
     mov ds, ax
     mov es, ax
+    mov bx, ss
     mov ss, ax
+    mov eax, esp
+    push word bx
+    push dword eax
     push dword ebp
     call dword main
     pop dword ebp
-    ret
+    mov bx, word[esp+4]
+    pop dword esp
+    mov ss, bx
+    retf
 _put:
     mov	al, byte[esp+4]  ; 字符=第一个参数
     mov	bx, 0007h        ; 页号为0(BH = 0) 黑底白字(BL = 07h)
@@ -30,6 +37,9 @@ _move:
     int 10h              ; 移动光标
     ret
 _get:
+    mov ah, 1
+    int 16h
+    jz _get
     mov ah, 0
     int 16h
     ret
