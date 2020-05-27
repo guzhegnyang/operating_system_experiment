@@ -6,7 +6,7 @@
 ** Use VBoxManage or the VirtualBox Manager GUI to make changes.
 -->
 <VirtualBox xmlns="http://www.virtualbox.org/" version="1.15-windows">
-  <Machine uuid="{530ad47f-28a7-47a3-b9da-64aefe5d2b78}" name="18308045PC" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-05-14T16:04:48Z">
+  <Machine uuid="{530ad47f-28a7-47a3-b9da-64aefe5d2b78}" name="18308045PC" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-05-27T17:38:48Z">
     <MediaRegistry>
       <HardDisks>
         <HardDisk uuid="{3c85d7c3-5df3-4bb9-a685-5a87a2038101}" location="18308045PC.vdi" format="VDI" type="Normal"/>
@@ -19,14 +19,17 @@
         <Image uuid="{7fc925ff-3559-4d09-a728-b9daccd9eab8}" location="F:/&#x8C37;&#x6B63;&#x9633;/&#x4EE3;&#x7801;/&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x5B9E;&#x9A8C;/&#x5B9E;&#x9A8C;3/EX3.img"/>
         <Image uuid="{9bd2688a-aa2f-4d67-abe1-9c472555be2b}" location="F:/&#x8C37;&#x6B63;&#x9633;/&#x4EE3;&#x7801;/&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x5B9E;&#x9A8C;/temp/EX3.img"/>
         <Image uuid="{7a30bea8-c658-444e-82c6-2fbdda949e71}" location="F:/&#x8C37;&#x6B63;&#x9633;/&#x4EE3;&#x7801;/&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x5B9E;&#x9A8C;/&#x5B9E;&#x9A8C;3/EX3/EX3.img"/>
+        <Image uuid="{1b4679de-0a0f-4788-9662-65e736a5cbb8}" location="F:/&#x8C37;&#x6B63;&#x9633;/&#x4EE3;&#x7801;/&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x5B9E;&#x9A8C;/&#x5B9E;&#x9A8C;4/EX4.img"/>
+        <Image uuid="{947b12ca-3f64-4e0c-bdaa-7f4e7db936b8}" location="F:/&#x8C37;&#x6B63;&#x9633;/&#x4EE3;&#x7801;/&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x5B9E;&#x9A8C;/&#x5B9E;&#x9A8C;4 - &#x526F;&#x672C;/EX4.img"/>
+        <Image uuid="{8bb6fd8f-db52-4dfb-88df-2d22b57c2926}" location="F:/&#x8C37;&#x6B63;&#x9633;/&#x4EE3;&#x7801;/&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x5B9E;&#x9A8C;/&#x5B9E;&#x9A8C;4/EX4/EX4.img"/>
       </FloppyImages>
     </MediaRegistry>
     <ExtraData>
       <ExtraDataItem name="GUI/LastCloseAction" value="PowerOff"/>
-      <ExtraDataItem name="GUI/LastNormalWindowPosition" value="915,261,720,451"/>
+      <ExtraDataItem name="GUI/LastNormalWindowPosition" value="832,259,720,452"/>
     </ExtraData>
     <Hardware>
-      <CPU>
+      <CPU count="2">
         <PAE enabled="false"/>
         <LongMode enabled="false"/>
         <HardwareVirtExLargePages enabled="true"/>
@@ -37,6 +40,7 @@
       <VideoCapture screens="1" file="." fps="25"/>
       <RemoteDisplay enabled="false"/>
       <BIOS>
+        <IOAPIC enabled="true"/>
         <SmbiosUuidLittleEndian enabled="true"/>
       </BIOS>
       <Network>
@@ -50,16 +54,13 @@
       <AudioAdapter controller="SB16" driver="DirectSound" enabled="true" enabledIn="false"/>
       <Clipboard/>
       <GuestProperties>
-        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1589472288619521100" flags="RDONLYGUEST"/>
-        <GuestProperty name="/VirtualBox/HostInfo/VBoxRev" value="137129" timestamp="1589472288609762602" flags="TRANSIENT, RDONLYGUEST"/>
-        <GuestProperty name="/VirtualBox/HostInfo/VBoxVer" value="6.1.6" timestamp="1589472288609762600" flags="TRANSIENT, RDONLYGUEST"/>
-        <GuestProperty name="/VirtualBox/HostInfo/VBoxVerExt" value="6.1.6" timestamp="1589472288609762601" flags="TRANSIENT, RDONLYGUEST"/>
+        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1590600974608947700" flags=""/>
       </GuestProperties>
     </Hardware>
     <StorageControllers>
       <StorageController name="Floppy" type="I82078" PortCount="1" useHostIOCache="true" Bootable="true">
         <AttachedDevice type="Floppy" hotpluggable="false" port="0" device="0">
-          <Image uuid="{7a30bea8-c658-444e-82c6-2fbdda949e71}"/>
+          <Image uuid="{8bb6fd8f-db52-4dfb-88df-2d22b57c2926}"/>
         </AttachedDevice>
       </StorageController>
       <StorageController name="IDE" type="PIIX4" PortCount="2" useHostIOCache="true" Bootable="true">
