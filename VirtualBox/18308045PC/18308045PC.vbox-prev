@@ -6,7 +6,7 @@
 ** Use VBoxManage or the VirtualBox Manager GUI to make changes.
 -->
 <VirtualBox xmlns="http://www.virtualbox.org/" version="1.15-windows">
-  <Machine uuid="{530ad47f-28a7-47a3-b9da-64aefe5d2b78}" name="18308045PC" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-05-27T17:38:48Z">
+  <Machine uuid="{530ad47f-28a7-47a3-b9da-64aefe5d2b78}" name="18308045PC" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-05-28T07:45:57Z">
     <MediaRegistry>
       <HardDisks>
         <HardDisk uuid="{3c85d7c3-5df3-4bb9-a685-5a87a2038101}" location="18308045PC.vdi" format="VDI" type="Normal"/>
@@ -26,7 +26,7 @@
     </MediaRegistry>
     <ExtraData>
       <ExtraDataItem name="GUI/LastCloseAction" value="PowerOff"/>
-      <ExtraDataItem name="GUI/LastNormalWindowPosition" value="832,259,720,452"/>
+      <ExtraDataItem name="GUI/LastNormalWindowPosition" value="832,259,720,451"/>
     </ExtraData>
     <Hardware>
       <CPU count="2">
@@ -54,7 +54,7 @@
       <AudioAdapter controller="SB16" driver="DirectSound" enabled="true" enabledIn="false"/>
       <Clipboard/>
       <GuestProperties>
-        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1590600974608947700" flags=""/>
+        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1590601129364733000" flags=""/>
       </GuestProperties>
     </Hardware>
     <StorageControllers>
