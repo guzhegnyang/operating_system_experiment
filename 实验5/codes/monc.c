@@ -20,12 +20,19 @@ extern void _put(char ch);
 extern void _move(int x, int y);
 extern unsigned short _get();
 extern void _cls();
+extern void _call(unsigned cs, void (*fun)(void *arg), void *arg);
 extern void _callf(int cl, int ch, int dh, int len);
 extern void _display(char ch, int x, int y, int color);
 extern void _get_time();
 extern unsigned char _time[6];
+extern void _clock_hotwheel(int *n_ptr);
+extern void _clock_time(int *n_ptr);
+extern void _clock_ouch(int *n_ptr);
 extern void _set_int(int cs, void (*inter)(), int index);
 extern void _clock();
+extern void _int_20h();
+extern void _int_21h();
+extern void _int_22h();
 int chheader, cursor, cursor_x, cursor_y;
 void int2str(int n, char *str)
 {
@@ -389,7 +396,7 @@ int execute(char *buf)
     if (*ptr != 0)
     {
         *ptr = 0;
-        ptr++; //有坂数
+        ptr++;
     }
     for (int i = 0; i < cmdsz; i++)
     {
@@ -429,17 +436,19 @@ int new_layer(char *str, int x, int y, int color, int cursor)
 }*/
 struct layfun
 {
+    unsigned cs;
     void (*fun)(int *n_ptr);
     int n;
 };
 struct layfun lyfnsp[LYSPSZ];
 struct node lyfnndsp[LYSPSZ];
 int lyfnheader;
-int new_layfun(void (*fun)(int *n_ptr), int n, int cursor)
+int new_layfun(unsigned cs, void (*fun)(int *n_ptr), int n, int cursor)
 {
     int neo_layfun = new_node(cursor, &lyfnheader, lyfnndsp);
     if (neo_layfun != null)
     {
+        lyfnsp[neo_layfun].cs = cs;
         lyfnsp[neo_layfun].fun = fun;
         lyfnsp[neo_layfun].n = n;
     }
@@ -511,9 +520,9 @@ void clock_ouch(int *n_ptr)
 }*/
 void clock()
 {
-    for (int ptr = lyfnheader; lyfnsp[ptr].fun != NULL; ptr = lyfnndsp[ptr].next)
+    for (int ptr = lyfnheader; lyfnsp[ptr].cs != 0 || lyfnsp[ptr].fun != NULL; ptr = lyfnndsp[ptr].next)
     {
-        lyfnsp[ptr].fun(&lyfnsp[ptr].n);
+        _call(lyfnsp[ptr].cs, (void (*)(void *))lyfnsp[ptr].fun, (void *)&lyfnsp[ptr].n);
         if (lyfnsp[ptr].n == 0)
         {
             delete_node(ptr, &lyfnheader, lyfnndsp);
@@ -548,7 +557,10 @@ void init()
     program[4].name = "CAL.COM";
     program[4].stt = 36;
     program[4].len = 12;
-    progsz = 5;
+    program[5].name = "WP.COM";
+    program[5].stt = 48;
+    program[5].len = 1;
+    progsz = 6;
     init_node(&chheader, chndsp, CHSPSZ);
     chsp[chheader] = 0;
     init_node(&lyheader, lyndsp, LYSPSZ);
@@ -557,11 +569,15 @@ void init()
     lysp[lyheader].str = NULL;
     lysp[lyheader].color = 0;
     init_node(&lyfnheader, lyfnndsp, LYSPSZ);
+    lyfnsp[lyfnheader].cs = 0;
     lyfnsp[lyfnheader].fun = NULL;
     lyfnsp[lyfnheader].n = 0;
-    new_layfun(clock_hotwheel, 3, lyfnheader);
-    new_layfun(clock_time, 4, lyfnheader);
+    new_layfun(0x800, _clock_hotwheel, 3, lyfnheader);
+    new_layfun(0x800, _clock_time, 4, lyfnheader);
     _set_int(0x800, _clock, 8);
+    _set_int(0x800, _int_20h, 0x20);
+    _set_int(0x800, _int_21h, 0x21);
+    _set_int(0x800, _int_22h, 0x22);
 }
 int main()
 {
