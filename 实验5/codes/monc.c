@@ -557,9 +557,9 @@ void init()
     program[4].name = "CAL.COM";
     program[4].stt = 36;
     program[4].len = 12;
-    program[5].name = "WP.COM";
+    program[5].name = "WALL.COM";
     program[5].stt = 48;
-    program[5].len = 1;
+    program[5].len = 12;
     progsz = 6;
     init_node(&chheader, chndsp, CHSPSZ);
     chsp[chheader] = 0;

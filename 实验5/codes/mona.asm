@@ -333,6 +333,7 @@ _int_22h:
     push dword 0
     push dword _int_22h_str
     call dword display_str
+    add esp, 16
     call dword _restart
     iret
 _data_define:
