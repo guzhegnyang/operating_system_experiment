@@ -377,7 +377,6 @@ void read(char *buf, int x, int y, int color)
 }
 void init()
 {
-    _cls();
     init_node(&chheader, chndsp, CHSPSZ);
     chsp[chheader] = 0;
 }
