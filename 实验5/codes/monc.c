@@ -559,7 +559,7 @@ void init()
     program[4].len = 12;
     program[5].name = "WALL.COM";
     program[5].stt = 48;
-    program[5].len = 12;
+    program[5].len = 13;
     progsz = 6;
     init_node(&chheader, chndsp, CHSPSZ);
     chsp[chheader] = 0;

@@ -14,24 +14,25 @@ struct ahch
 unsigned short _get();
 void _cls();
 void _display(char ch, int x, int y, int color);
+void _move(int x, int y);
 __asm__(
     "_get:\n"
     "    mov  $0x1, %ah\n"
-    "    int  $0x10\n"
+    "    int  $0x16\n"
     "    jz   _get\n"
     "    mov  $0x0, %ah\n"
-    "    int  $0x10\n"
+    "    int  $0x16\n"
     "    ret\n"
     "_cls:\n"
     "    mov  $0x3, %ax\n"
-    "    int  $0xa\n"
+    "    int  $0x10\n"
     "    ret\n"
     "_display:\n"
     "    mov  12(%esp), %eax\n"
     "    mov  $0x50, %ebx\n"
     "    mul  %ebx\n"
     "    add  8(%esp), %eax\n"
-    "    mov  $0x1, %ebx\n"
+    "    mov  $0x2, %ebx\n"
     "    mul  %ebx\n"
     "    mov  %eax, %ebx\n"
     "    mov  $0xb800, %ax\n"
@@ -40,7 +41,13 @@ __asm__(
     "    mov  4(%esp), %al\n"
     "    mov  %ax, %gs:(%ebx)\n"
     "    ret\n"
-);
+    "_move:\n"
+    "    mov  4(%esp), %dl\n"
+    "    mov  8(%esp), %dh\n"
+    "    mov  $0x0, %bh\n"
+    "    mov  $0x2, %ah\n"
+    "    int  $0x10\n"
+    "    ret\n");
 int chheader, cursor, cursor_x, cursor_y;
 int top;
 char stk[32];
@@ -83,6 +90,10 @@ void float2str(float fn, char *s)
     }
     top = 0;
     int n = (int)fn;
+    if (n == 0)
+    {
+        s[i++] = '0';
+    }
     while (n != 0)
     {
         stk[top++] = n % 10 + '0';
@@ -105,10 +116,13 @@ void float2str(float fn, char *s)
 }
 void strcpy(char *dest, char *src)
 {
-    for (int i = 0; src[i] != 0; i++)
+    int i = 0;
+    while (src[i] != 0)
     {
         dest[i] = src[i];
+        i++;
     }
+    dest[i] = 0;
 }
 float str2num(char *s, int *i_ptr)
 {
@@ -160,6 +174,14 @@ void putch(char ch, int init_x, int init_y, int color)
     {
         cursor_x = init_x;
         cursor_y++;
+    }
+    else if (ch == '\t')
+    {
+        if (cursor_x >= 76)
+        {
+            cursor_x = init_x + cursor_x - 76;
+            cursor_y++;
+        }
     }
     else
     {
@@ -266,24 +288,8 @@ void dump_node(char buf[])
     int i = 0;
     while (chsp[chheader] != 0)
     {
-        if (chsp[chheader] >= 'a' && chsp[chheader] <= 'z')
-        {
-            chsp[chheader] += 'A' - 'a';
-        }
-        else if (chsp[chheader] == '\t')
-        {
-            chsp[chheader] = ' ';
-        }
-        buf[i] = chsp[chheader];
+        buf[i++] = chsp[chheader];
         delete_node(chheader, &chheader, chndsp);
-        if (buf[i] == ' ')
-        {
-            while (chheader != null && (chsp[chheader] == ' ' || chsp[chheader] == '\t'))
-            {
-                delete_node(chheader, &chheader, chndsp);
-            }
-        }
-        i++;
     }
     buf[i] = 0;
 }
@@ -304,6 +310,7 @@ void read(char *buf, int x, int y, int color)
                 {
                     cursor = chndsp[cursor].last;
                     cursor_x -= 1;
+                    _move(cursor_x, cursor_y);
                 }
             }
             else if (ax.ah == RIGHT)
@@ -312,12 +319,14 @@ void read(char *buf, int x, int y, int color)
                 {
                     cursor = chndsp[cursor].next;
                     cursor_x += 1;
+                    _move(cursor_x, cursor_y);
                 }
             }
             else if (ax.ah == UP)
             {
                 cursor = chheader;
                 cursor_x = x;
+                _move(cursor_x, cursor_y);
             }
             else if (ax.ah == DOWN)
             {
@@ -325,6 +334,7 @@ void read(char *buf, int x, int y, int color)
                 {
                     cursor_x++;
                 }
+                _move(cursor_x, cursor_y);
             }
         }
         else if (ax.ch == '\b')
@@ -334,11 +344,14 @@ void read(char *buf, int x, int y, int color)
                 delete_node(chndsp[cursor].last, &chheader, chndsp);
                 cursor_x--;
                 int temp_x = cursor_x;
+                _move(cursor_x, cursor_y);
                 for (int temp = cursor; temp != null; temp = chndsp[temp].next)
                 {
-                    _display(chsp[temp], cursor_x, cursor_y, color);
+                    _display(chsp[temp], temp_x, cursor_y, color);
                     temp_x++;
+                    _move(temp_x, cursor_y);
                 }
+				_move(cursor_x, cursor_y);
             }
         }
         else
@@ -349,10 +362,12 @@ void read(char *buf, int x, int y, int color)
                 int temp_x = cursor_x;
                 for (; chsp[temp] != 0; temp = chndsp[temp].next)
                 {
-                    _display(chsp[temp], cursor_x, cursor_y, color);
+                    _display(chsp[temp], temp_x, cursor_y, color);
                     temp_x++;
+					_move(temp_x, cursor_y);
                 }
                 cursor_x++;
+				_move(cursor_x, cursor_y);
             }
         }
         temp_ax = _get();
