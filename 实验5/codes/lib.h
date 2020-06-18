@@ -15,6 +15,7 @@ unsigned short _get();
 void _cls();
 void _display(char ch, int x, int y, int color);
 void _move(int x, int y);
+unsigned _get_cs();
 __asm__(
     "_get:\n"
     "    mov  $0x1, %ah\n"
@@ -29,24 +30,30 @@ __asm__(
     "    ret\n"
     "_display:\n"
     "    mov  12(%esp), %eax\n"
-    "    mov  $0x50, %ebx\n"
-    "    mul  %ebx\n"
+    "    mov  $0x50, %ecx\n"
+    "    mul  %ecx\n"
     "    add  8(%esp), %eax\n"
-    "    mov  $0x2, %ebx\n"
-    "    mul  %ebx\n"
-    "    mov  %eax, %ebx\n"
+    "    mov  $0x2, %ecx\n"
+    "    mul  %ecx\n"
+    "    mov  %eax, %ecx\n"
     "    mov  $0xb800, %ax\n"
     "    mov  %ax, %gs\n"
     "    mov  16(%esp), %ah\n"
     "    mov  4(%esp), %al\n"
-    "    mov  %ax, %gs:(%ebx)\n"
+    "    mov  %ax, %gs:(%ecx)\n"
     "    ret\n"
     "_move:\n"
     "    mov  4(%esp), %dl\n"
     "    mov  8(%esp), %dh\n"
+    "    mov  %bh, %ch\n"
     "    mov  $0x0, %bh\n"
     "    mov  $0x2, %ah\n"
     "    int  $0x10\n"
+    "    mov  %ch, %bh\n"
+    "    ret\n"
+    "_get_cs:\n"
+    "    mov  $0, %eax\n"
+    "    mov  %cs, %ax\n"
     "    ret\n");
 int chheader, cursor, cursor_x, cursor_y;
 int top;
@@ -65,13 +72,13 @@ void int2str(int n, char *str, int base)
         stk[top] = n % base;
         if (stk[top] >= 10)
         {
-            str[top] += 'a' - 10;
+            stk[top] += 'a' - 10;
         }
         else
         {
-            str[top] += '0';
+            stk[top] += '0';
         }
-        n /= 10;
+        n /= base;
         top++;
     }
     while (top != 0)
@@ -136,7 +143,7 @@ float str2num(char *s, int *i_ptr)
         }
         if (s[*i_ptr + 1] == '.')
         {
-            i_ptr++;
+            (*i_ptr)++;
             while (s[*i_ptr + 1] >= '0' && s[*i_ptr + 1] <= '9')
             {
                 num = num * 10 + s[++*i_ptr] - '0';
@@ -427,7 +434,7 @@ void printf(int x, int y, int color, const char *fmt, ...)
                 offset++;
                 break;
             case 'f':
-                float2str(*(float *)(&fmt + offset), buf);
+                float2str(**(float **)(&fmt + offset), buf);
                 puts(buf, x, y, color);
                 offset++;
                 break;
@@ -487,3 +494,23 @@ void scanf(int x, int y, int color, const char *fmt, ...)
         }
     }
 }
+struct layer
+{
+    unsigned ds;
+    char *str;
+    int x;
+    int y;
+    int color;
+};
+struct layinfo
+{
+    int n;
+    int is_lay;
+    struct layer lay;
+};
+struct layfun
+{
+    unsigned cs;
+    int (*fun)(int n);
+    int n;
+};

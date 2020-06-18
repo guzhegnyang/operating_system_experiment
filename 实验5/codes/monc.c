@@ -20,14 +20,15 @@ extern void _put(char ch);
 extern void _move(int x, int y);
 extern unsigned short _get();
 extern void _cls();
-extern void _call(unsigned cs, void (*fun)(void *arg), void *arg);
+extern unsigned char _memb(unsigned ds, unsigned char *ptr);
+extern unsigned _call(unsigned cs, unsigned (*fun)(unsigned arg), unsigned arg);
 extern void _callf(int cl, int ch, int dh, int len);
 extern void _display(char ch, int x, int y, int color);
 extern void _get_time();
 extern unsigned char _time[6];
-extern void _clock_hotwheel(int *n_ptr);
-extern void _clock_time(int *n_ptr);
-extern void _clock_ouch(int *n_ptr);
+extern int _clock_hotwheel(int n);
+extern int _clock_time(int n);
+extern int _clock_ouch(int n);
 extern void _set_int(int cs, void (*inter)(), int index);
 extern void _clock();
 extern void _int_20h();
@@ -54,21 +55,25 @@ void BCD2str(unsigned char BCD, char *str)
     str[0] = (BCD >> 4) + '0';
     str[1] = (BCD & 0xf) + '0';
 }
-void display_str(char *str, int x, int y, int color)
+void display_str(unsigned ds, char *str, int x, int y, int color)
 {
     int offset_x = 0, offset_y = 0;
-    for (int i = 0; str[i] != 0; i++)
+    int i = 0;
+    char ch = _memb(ds, (unsigned char *)str);
+    while (ch != 0)
     {
-        if (str[i] == '\n')
+        if (ch == '\n')
         {
             offset_x = 0;
             offset_y++;
         }
         else
         {
-            _display(str[i], x + offset_x, y + offset_y, color);
+            _display(ch, x + offset_x, y + offset_y, color);
             offset_x++;
         }
+        i++;
+        ch = _memb(ds, (unsigned char *)str + i);
     }
 }
 void new_page()
@@ -410,6 +415,7 @@ int execute(char *buf)
 }
 struct layer
 {
+    unsigned ds;
     char *str;
     int x;
     int y;
@@ -418,11 +424,12 @@ struct layer
 struct layer lysp[LYSPSZ];
 struct node lyndsp[LYSPSZ];
 int lyheader;
-int new_layer(char *str, int x, int y, int color, int cursor)
+int new_layer(unsigned ds, char *str, int x, int y, int color, int cursor)
 {
     int neo_layer = new_node(cursor, &lyheader, lyndsp);
     if (neo_layer != null)
     {
+        lysp[neo_layer].ds = ds;
         lysp[neo_layer].str = str;
         lysp[neo_layer].x = x;
         lysp[neo_layer].y = y;
@@ -434,16 +441,22 @@ int new_layer(char *str, int x, int y, int color, int cursor)
 {
     delete_node(nd, &lyheader, lyndsp);
 }*/
+struct layinfo
+{
+    int n;
+    int is_lay;
+    struct layer lay;
+};
 struct layfun
 {
     unsigned cs;
-    void (*fun)(int *n_ptr);
+    int (*fun)(int n);
     int n;
 };
 struct layfun lyfnsp[LYSPSZ];
 struct node lyfnndsp[LYSPSZ];
 int lyfnheader;
-int new_layfun(unsigned cs, void (*fun)(int *n_ptr), int n, int cursor)
+int new_layfun(unsigned cs, int (*fun)(int n), int n, int cursor)
 {
     int neo_layfun = new_node(cursor, &lyfnheader, lyfnndsp);
     if (neo_layfun != null)
@@ -458,53 +471,77 @@ int new_layfun(unsigned cs, void (*fun)(int *n_ptr), int n, int cursor)
 {
     delete_node(nd, &lyfnheader, lyfnndsp);
 }*/
+struct layinfo hotwheel_info;
 char hotwheel_arr[] = "/|\\";
 char hotwheel_str[] = {0, 0};
-void clock_hotwheel(int *n_ptr)
+unsigned clock_hotwheel(int n)
 {
-    hotwheel_str[0] = hotwheel_arr[*n_ptr % 3];
-    new_layer(hotwheel_str, 60, 24, 0b00111111, lyheader);
-    *n_ptr -= 1;
-    if (*n_ptr % 3 == 0)
+    hotwheel_str[0] = hotwheel_arr[n % 3];
+    hotwheel_info.is_lay = 1;
+    hotwheel_info.lay.ds = 0x800;
+    hotwheel_info.lay.str = hotwheel_str;
+    hotwheel_info.lay.x = 60;
+    hotwheel_info.lay.y = 24;
+    hotwheel_info.lay.color = 0b00111111;
+    n -= 1;
+    if (n % 3 == 0)
     {
-        *n_ptr = 3;
+        n = 3;
     }
+    hotwheel_info.n = n;
+    return (0x800 << 16) + (unsigned)&hotwheel_info;
 }
 /*void hotwheel()
 {
     new_layfun(clock_hotwheel, 3, lyfnheader);
 }*/
-char clock_str[20] = "20yy/mm/dd hh:mm:ss";
-void clock_time(int *n_ptr)
+struct layinfo time_info;
+char time_str[20] = "20yy/mm/dd hh:mm:ss";
+unsigned clock_time(int n)
 {
-    if (*n_ptr % 2 == 0)
+    time_info.is_lay = 0;
+    if (n % 2 == 0)
     {
         _get_time();
-        char *ptr = clock_str + 2;
+        char *ptr = time_str + 2;
         for (int i = 0; i < 6; i++)
         {
             BCD2str(_time[i], ptr);
             ptr += 3;
         }
-        new_layer(clock_str, 61, 24, 0b00111101, lyheader);
+        time_info.is_lay = 1;
+        time_info.lay.ds = 0x800;
+        time_info.lay.str = time_str;
+        time_info.lay.x = 61;
+        time_info.lay.y = 24;
+        time_info.lay.color = 0b00111101;
     }
-    *n_ptr -= 1;
-    if (*n_ptr % 2 == 0)
+    n -= 1;
+    if (n % 2 == 0)
     {
-        *n_ptr = 2;
+        n = 2;
     }
+    time_info.n = n;
+    return (0x800 << 16) + (unsigned)&time_info;
 }
 /*void time()
 {
     new_layfun(clock_time, 4, lyfnheader);
 }*/
+struct layinfo ouch_info;
 char ouch_str[] = "OUCH!OUCH!";
 int ouch_color;
-void clock_ouch(int *n_ptr)
+int clock_ouch(int n)
 {
-    new_layer(ouch_str, 35, 12, ouch_color, lyheader);
-    *n_ptr -= 1;
-    if (*n_ptr == 1)
+    ouch_info.is_lay = 1;
+    ouch_info.lay.ds = 0x800;
+    ouch_info.lay.str = ouch_str;
+    ouch_info.lay.x = 35;
+    ouch_info.lay.y = 12;
+    ouch_info.lay.color = ouch_color;
+    new_layer(0x800, ouch_str, 35, 12, ouch_color, lyheader);
+    n -= 1;
+    if (n == 1)
     {
         ouch_color = 0;
     }
@@ -512,17 +549,30 @@ void clock_ouch(int *n_ptr)
     {
         ouch_color = ~ouch_color;
     }
+    return (0x800 << 16) + (unsigned)&ouch_info;
 }
 /*void ouch()
 {
     ouch_color = 0b11100100;
     new_layfun(clock_ouch, 4, lyfnheader);
 }*/
+struct layinfo layer_info;
 void clock()
 {
     for (int ptr = lyfnheader; lyfnsp[ptr].cs != 0 || lyfnsp[ptr].fun != NULL; ptr = lyfnndsp[ptr].next)
     {
-        _call(lyfnsp[ptr].cs, (void (*)(void *))lyfnsp[ptr].fun, (void *)&lyfnsp[ptr].n);
+        unsigned info_ptr = _call(lyfnsp[ptr].cs, (unsigned (*)(unsigned))lyfnsp[ptr].fun, lyfnsp[ptr].n);
+        unsigned ds = info_ptr >> 16;
+        unsigned char *addr = (unsigned char *)(info_ptr - (ds << 16));
+        for (int i = 0; i < sizeof(struct layinfo); i++)
+        {
+            *((unsigned char *)&layer_info + i) = _memb(ds, addr + i);
+        }
+        lyfnsp[ptr].n = layer_info.n;
+        if (layer_info.is_lay != 0)
+        {
+            new_layer(layer_info.lay.ds, layer_info.lay.str, layer_info.lay.x, layer_info.lay.y, layer_info.lay.color, lyheader);
+        }
         if (lyfnsp[ptr].n == 0)
         {
             delete_node(ptr, &lyfnheader, lyfnndsp);
@@ -530,7 +580,7 @@ void clock()
     }
     while (lysp[lyheader].str != NULL)
     {
-        display_str(lysp[lyheader].str, lysp[lyheader].x, lysp[lyheader].y, lysp[lyheader].color);
+        display_str(lysp[lyheader].ds, lysp[lyheader].str, lysp[lyheader].x, lysp[lyheader].y, lysp[lyheader].color);
         delete_node(lyheader, &lyheader, lyndsp);
     }
 }

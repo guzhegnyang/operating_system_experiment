@@ -100,7 +100,7 @@ BCD2str:
 	movl	12(%ebp), %eax
 	incl	%eax
 	movb	%dl, (%eax)
-	nogsp
+	nop
 	leave
 	.cfi_restore 5
 	.cfi_def_cfa 4, 4

@@ -1,5 +1,7 @@
 BITS 16
 extern main
+;extern lyheader
+;extern new_layer
 extern lyfnheader
 extern new_layfun
 extern clock_hotwheel
@@ -13,6 +15,7 @@ global _put
 global _move
 global _get
 global _cls
+global _memb
 global _call
 global _callf
 global _display
@@ -30,31 +33,35 @@ _start:
     push dword ebp
     mov ax, cs
     mov ds, ax
-    mov bx, ss
+    mov cx, ss
     mov ss, ax
     mov ebp, esp
     mov esp, 0xffff
-    push word bx
+    push word cx
     push dword ebp
     call dword main
-    mov bx, word[esp+4]
+    mov cx, word[esp+4]
     pop dword esp
-    mov ss, bx
+    mov ss, cx
     pop dword ebp
     retf
 _put:
     mov	al, byte[esp+4]       ; 字符=第一个参数
+    mov dx, bx
     mov	bx, 0007h             ; 页号为0(BH = 0) 黑底白字(BL = 07h)
     mov cx, 1                 ; 重复次数
     mov ah, 9                 ; 功能号
     int 10h                   ; 打印字符
+    mov bx, dx
     o32 ret
 _move:
     mov dl, byte[esp+4]       ; x
     mov dh, byte[esp+8]       ; y
+    mov ch, bh
     mov bh, 0                 ; 显示页码
     mov ah, 2                 ; 功能号
     int 10h                   ; 移动光标
+    mov bh, ch
     o32 ret
 _get:
     mov ah, 1
@@ -67,30 +74,38 @@ _cls:
     mov ax, 3
     int 10h
     o32 ret
+_memb:
+    mov ax, word [esp + 4]
+    mov es, ax
+    mov eax, dword [esp + 8]
+    mov al, byte [es:eax]
+    o32 ret
 _call:
     mov ax, word [esp + 4]    ; ker-stack: ker-ret-addr/user-cs/user-ip/arg
-    mov bx, word [esp + 8]
+    mov dx, word [esp + 8]
     mov ecx, dword [esp + 12]
     push dword ebp            ; ker-stack: ebp/ker-ret-addr/user-cs/user-ip/arg
-    mov dx, sp
+    push dword ebx            ; ker-stack: ebx/ebp/ker-ret-addr/user-cs/user-ip/arg 
+    mov bx, sp
     mov ss, ax
-    mov sp, 0xefff            ; user-stack: ，ker-stack: ebp/ker-ret-addr/user-cs/user-ip/arg
-    push word dx              ; user-stack: ker-sp
+    mov sp, 0xefff            ; user-stack: ，ker-stack: ebx/ebp/ker-ret-addr/user-cs/user-ip/arg
+    push word bx              ; user-stack: ker-sp
     push dword ecx            ; user-stack: arg/ker-sp
     push word 0x800           ; user-stack: ker-cs/arg/ker-sp
     push word _call_ret       ; user-stack: ker-next-ip/ker-cs/arg/ker-sp
     push word ax              ; user-stack: user-cs/ker-next-ip/ker-cs/arg/ker-sp
-    push word bx              ; user-stack: user-ip/user-cs/ker-next-ip/ker-cs/arg/ker-sp
+    push word dx              ; user-stack: user-ip/user-cs/ker-next-ip/ker-cs/arg/ker-sp
     mov ds, ax
     retf                      ; user-stack: ker-next-ip/ker-cs/arg/ker-sp
-_call_ret:                    ; user-stack: arg/ker-sp（在用户程序retf后）
-    add sp, 4                 ; user-stack: ker-sp
-    mov ax, cs
-    mov ds, ax
-    mov ss, ax
-    pop word sp               ; ker-stack: ebp/ker-ret-addr/user-cs/user-ip，user-stack:
-    pop dword ebp             ; ker-stack: ker-ret-addr/user-cs/user-ip
-    o32 ret                   ; ker-stack: user-cs/user-ip
+_call_ret:                    ; user-stack: arg/ker-sp（在用户程序retf后），返回值：eax
+    add sp, 4                 ; user-stack: ker-sp，返回值：eax
+    pop word sp
+    mov bx, cs
+    mov ds, bx
+    mov ss, bx                ; ker-stack: ebx/ebp/ker-ret-addr/user-cs/user-ip，user-stack:，返回值：eax
+    pop dword ebx             ; ker-stack: ebp/ker-ret-addr/user-cs/user-ip，user-stack:，返回值：eax
+    pop dword ebp             ; ker-stack: ker-ret-addr/user-cs/user-ip，返回值：eax
+    o32 ret                   ; ker-stack: user-cs/user-ip，返回值：eax
 _callf:
     xor ax, ax                ; AX = 0
     mov es, ax                ; ES = 0
@@ -101,6 +116,7 @@ _callf:
     mov ch, byte[esp+8]       ; 柱面号 ; 起始编号为0
     mov dh, byte[esp+12]      ; 磁头号 ; 起始编号为0
     mov al, byte[esp+16]      ; 扇区数
+    push dword ebx
     mov bx, 0x100             ; 偏移地址; 存放数据的内存偏移地址
     mov ah, 2                 ; 功能号
     mov dl, 0                 ; 驱动器号 ; 软盘为0，硬盘和U盘为80H
@@ -118,20 +134,21 @@ _callf:
     jmp 0xb00:0x100           ; 0xb100
 _after_user_ret:
     pop dword ebp
+    pop dword ebx
     o32 ret
 _display:
     mov eax, dword[esp+12]
-    mov ebx, 80
-    mul ebx
+    mov ecx, 80
+    mul ecx
     add eax, dword[esp+8]
-    mov ebx, 2
-    mul ebx
-    mov ebx, eax
+    mov ecx, 2
+    mul ecx
+    mov ecx, eax
     mov	ax, 0B800h            ; 文本窗口显存起始地址
     mov	gs, ax                ; GS = B800h
     mov ah, byte[esp+16]      ; 0000：黑底、1111：亮白字（默认值为07h）
     mov al, byte[esp+4]       ; AL = 显示字符值（默认值为20h=空格符）
-    mov [gs:ebx], ax          ; 屏幕第 x 行, 第 y 列
+    mov [gs:ecx], ax          ; 屏幕第 x 行, 第 y 列
     o32 ret
 _get_time:
     mov al, 0                 ; Get seconds (00 to 59)
@@ -234,11 +251,11 @@ _set_int:
     xor ax, ax                ; AX = 0
     mov es, ax                ; ES = 0
     mov ax, word[esp+8]
-    mov ebx, dword[esp+12]
-    shl ebx, 2
-    mov word[es:ebx], ax      ; 设置中断向量的偏移地址
+    mov ecx, dword[esp+12]
+    shl ecx, 2
+    mov word[es:ecx], ax      ; 设置中断向量的偏移地址
     mov ax, word[esp+4]
-    mov word[es:ebx+2], ax    ; 设置中断向量的段地址
+    mov word[es:ecx+2], ax    ; 设置中断向量的段地址
     sti
     o32 ret
 _clock:
@@ -298,6 +315,8 @@ _int_21h:
     jz _int_21h_2ch
     cmp ah, 0x63
     jz _int_21h_63h
+;    cmp ah, 0x64
+;    jz _int_21h_64h
 _int_21h_2ah:
     mov ch, 0
     mov cl, byte [_year]
@@ -307,9 +326,10 @@ _int_21h_2ah:
     mov word [_dx], dx
     jmp _int_21h_end
 _int_21h_2ch:
-    mov ch, byte [_minute]
-    mov cl, byte [_second]
-    mov dx, 0
+    mov ch, byte [_hour]
+    mov cl, byte [_minute]
+    mov dh, byte [_second]
+    mov dl, 0
     mov word [_cx], cx
     mov word [_dx], dx
     jmp _int_21h_end
@@ -323,6 +343,28 @@ _int_21h_63h:
     add esp, 16
     mov dword [_ax], eax
     jmp _int_21h_end
+;_int_21h_64h:
+;    mov esp, 0xefff
+;    push dword [lyheader]
+;    push word 0
+;    push word dx
+;    push word 0
+;    sub esp, 1
+;    mov byte [esp], 0
+;    sub esp, 1
+;    mov byte [esp], cl
+;    push word 0
+;    sub esp, 1
+;    mov byte[esp], 0
+;    sub esp, 1
+;    mov byte [esp], ch
+;    push dword ebx
+;    push word 0
+;    push word es
+;    call dword new_layer
+;    add esp, 24
+;    mov dword [_ax], eax
+;    jmp _int_21h_end
 _int_21h_end:
     call dword _restart
     iret
