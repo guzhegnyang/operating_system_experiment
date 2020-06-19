@@ -305,6 +305,7 @@ void read(char *buf, int x, int y, int color)
     cursor = chheader;
     cursor_x = x;
     cursor_y = y;
+    _move(cursor_x, cursor_y);
     unsigned short temp_ax = _get();
     struct ahch ax = *(struct ahch *)&temp_ax;
     while (ax.ch != '\r')
