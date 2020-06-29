@@ -1,5 +1,4 @@
 __asm__(".code16gcc\n");
-#define MaxProcessNo 10
 #define NULL ((void *)0)
 #define null 0
 #define CHSPSZ 256
@@ -12,6 +11,7 @@ __asm__(".code16gcc\n");
 #define CMDSZ 8
 #define PROGSZ 8
 #define LYSPSZ 16
+#define PCBSPSZ 10
 struct ahch
 {
     char ch;
@@ -37,14 +37,6 @@ struct reg
     unsigned int gs;
 };
 struct reg regs;
-struct PCB
-{
-    struct reg pregs;
-    int pid;
-    char pname[10];
-    char pstate;
-};
-struct PCB pcblist[MaxProcessNo];
 extern void _put(char ch);
 extern void _move(int x, int y);
 extern unsigned short _get();
@@ -391,6 +383,89 @@ void cmd_call(char *para)
         }
     }
 }
+struct PCB
+{
+    struct reg pregs;
+    int pid;
+    char pname[10];
+    char pstate;
+};
+struct PCB pcbsp[PCBSPSZ];
+struct node pcbndsp[PCBSPSZ];
+int pcbheader;
+int new_pcb(unsigned int cs, int pid, char *pname, int cursor)
+{
+    int neo_pcb = new_node(cursor, &pcbheader, pcbndsp);
+    if (neo_pcb != null)
+    {
+        pcbsp[neo_pcb].pregs.ax = 0;
+        pcbsp[neo_pcb].pregs.bx = 0;
+        pcbsp[neo_pcb].pregs.cx = 0;
+        pcbsp[neo_pcb].pregs.dx = 0;
+        pcbsp[neo_pcb].pregs.sp = 0xffff;
+        pcbsp[neo_pcb].pregs.bp = 0;
+        pcbsp[neo_pcb].pregs.si = 0;
+        pcbsp[neo_pcb].pregs.di = 0;
+        pcbsp[neo_pcb].pregs.ip = 100;
+        pcbsp[neo_pcb].pregs.flags = 512;
+        pcbsp[neo_pcb].pregs.es = 0;
+        pcbsp[neo_pcb].pregs.cs = cs;
+        pcbsp[neo_pcb].pregs.ss = cs;
+        pcbsp[neo_pcb].pregs.ds = cs;
+        pcbsp[neo_pcb].pregs.fs = 0;
+        pcbsp[neo_pcb].pregs.gs = 0;
+        pcbsp[neo_pcb].pid = pid;
+        for (int i = 0; i < 10 && pname[i] != 0; i++)
+        {
+            pcbsp[neo_pcb].pname[i] = pname[i];
+        }
+        pcbsp[neo_pcb].pstate = 0;
+    }
+    return neo_pcb;
+}
+void cmd_sync(char *para)
+{
+    char *ptr = para;
+    int es = 0x1000;
+    while (1)
+    {
+        for (; *ptr != 0 && *ptr != ' '; ptr++)
+            ;
+        if (*ptr != 0)
+        {
+            *ptr = 0;
+            for (int i = 0; i < progsz; i++)
+            {
+                if (cmp(para, program[i].name))
+                {
+                    int cl, ch, dh;
+                    vir2phy(program[i].stt, &cl, &ch, &dh);
+                    _load(cl, ch, dh, program[i].len, es);
+                    new_pcb(es, es / 0x1000, program[i].name, pcbheader);
+                    es += 0x1000;
+                    break;
+                }
+            }
+            ptr++;
+            para = ptr;
+        }
+        else
+        {
+            for (int i = 0; i < progsz; i++)
+            {
+                if (cmp(para, program[i].name))
+                {
+                    int cl, ch, dh;
+                    vir2phy(program[i].stt, &cl, &ch, &dh);
+                    _load(cl, ch, dh, program[i].len, es);
+                    new_pcb(es, es / 0x1000, program[i].name, pcbheader);
+                    break;
+                }
+            }
+            break;
+        }
+    }
+}
 void cmd_list(char *para)
 {
     new_page();
@@ -623,7 +698,9 @@ void init()
     command[0].fun = cmd_call;
     command[1].name = "LIST";
     command[1].fun = cmd_list;
-    cmdsz = 2;
+    command[2].name = "SYNC";
+    command[2].fun = cmd_sync;
+    cmdsz = 3;
     program[0].name = "LTUP.COM";
     program[0].stt = 32;
     program[0].len = 1;

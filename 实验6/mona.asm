@@ -107,7 +107,7 @@ _call_ret:                    ; user-stack: arg/ker-sp（在用户程序retf后�
     pop dword ebp             ; ker-stack: ker-ret-addr/user-cs/user-ip，返回值：eax
     o32 ret                   ; ker-stack: user-cs/user-ip，返回值：eax
 _load:
-    mov ax, 0x1000
+    mov ax, word[esp+20]
     mov es, ax                ; es:bx
     mov cl, byte[esp+4]       ; 扇区号
     mov ch, byte[esp+8]       ; 柱面号 ; 起始编号为0
