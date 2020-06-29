@@ -106,7 +106,7 @@ _call_ret:                    ; user-stack: arg/ker-sp（在用户程序retf后�
     pop dword ebx             ; ker-stack: ebp/ker-ret-addr/user-cs/user-ip，user-stack:，返回值：eax
     pop dword ebp             ; ker-stack: ker-ret-addr/user-cs/user-ip，返回值：eax
     o32 ret                   ; ker-stack: user-cs/user-ip，返回值：eax
-_callf:
+_load:
     mov ax, 0x1000
     mov es, ax                ; es:bx
     mov cl, byte[esp+4]       ; 扇区号
@@ -120,7 +120,7 @@ _callf:
     int 13H                   ; 调用读磁盘BIOS的13h功能
     pop dword ebx
     o32 ret
-_load:
+_callf:
     push dword ebx
     push dword ebp
     mov ax, 0x1000
