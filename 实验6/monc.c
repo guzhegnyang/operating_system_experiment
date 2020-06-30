@@ -36,6 +36,17 @@ struct reg
     unsigned int fs;
     unsigned int gs;
 };
+void reg_swap(struct reg* reg1, struct reg* reg2)
+{
+    unsigned int *p1 = (unsigned int *)reg1;
+    unsigned int *p2 = (unsigned int *)reg2;
+    for (int i = 0; i < 16; i++)
+    {
+        p1[i] += p2[i];
+        p2[i] = p1[i] - p2[i];
+        p1[i] -= p2[i];
+    }
+}
 struct reg regs;
 extern void _put(char ch);
 extern void _move(int x, int y);
@@ -392,7 +403,7 @@ struct PCB
 };
 struct PCB pcbsp[PCBSPSZ];
 struct node pcbndsp[PCBSPSZ];
-int pcbheader;
+int pcbheader, cur_pcb;
 int new_pcb(unsigned int cs, int pid, char *pname, int cursor)
 {
     int neo_pcb = new_node(cursor, &pcbheader, pcbndsp);
@@ -690,6 +701,9 @@ void clock()
         display_str(lysp[lyheader].ds, lysp[lyheader].str, lysp[lyheader].x, lysp[lyheader].y, lysp[lyheader].color);
         delete_node(lyheader, &lyheader, lyndsp);
     }
+    reg_swap(&pcbsp[cur_pcb].pregs, &regs);
+    cur_pcb = pcbndsp[cur_pcb].next;
+    reg_swap(&pcbsp[cur_pcb].pregs, &regs);
 }
 void init()
 {
@@ -733,6 +747,8 @@ void init()
     lyfnsp[lyfnheader].n = 0;
     new_layfun(0x800, _clock_hotwheel, 3, lyfnheader);
     new_layfun(0x800, _clock_time, 4, lyfnheader);
+    init_node(&pcbheader, pcbndsp, PCBSPSZ);
+    pcbsp[pcbheader].pid = 0;
     _set_int(0x800, _clock, 8);
     _set_int(0x800, _int_20h, 0x20);
     _set_int(0x800, _int_21h, 0x21);
