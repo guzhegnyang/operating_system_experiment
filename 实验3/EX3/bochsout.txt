@@ -33,7 +33,7 @@
 00000000000i[      ]   Sound support: SB16 ES1370
 00000000000i[      ]   USB support: UHCI OHCI EHCI xHCI
 00000000000i[      ]   VGA extension support: vbe cirrus voodoo
-00000000000i[MEM0  ] allocated memory at 00000215DFC96040. after alignment, vector=00000215DFC97000
+00000000000i[MEM0  ] allocated memory at 000002244317E040. after alignment, vector=000002244317F000
 00000000000i[MEM0  ] 32.00MB
 00000000000i[MEM0  ] mem block size = 0x00020000, blocks=256
 00000000000i[MEM0  ] rom at 0xfffe0000/131072 ('C:\Program Files\Bochs-2.6.11/BIOS-bochs-latest')
@@ -43,7 +43,7 @@
 00000000000i[DEV   ] PIIX3 PCI-to-ISA bridge present at device 1, function 0
 00000000000i[PLUGIN] init_dev of 'cmos' plugin device by virtual method
 00000000000i[CMOS  ] Using local time for initial clock
-00000000000i[CMOS  ] Setting initial clock to: Tue May 26 22:41:30 2020 (time0=1590504090)
+00000000000i[CMOS  ] Setting initial clock to: Thu Jun 18 21:45:39 2020 (time0=1592487939)
 00000000000i[PLUGIN] init_dev of 'dma' plugin device by virtual method
 00000000000i[DMA   ] channel 4 used by cascade
 00000000000i[PLUGIN] init_dev of 'pic' plugin device by virtual method
@@ -184,150 +184,344 @@
 00000000000i[PLUGIN] reset of 'usb_uhci' plugin device by virtual method
 00000000000i[      ] set SIGINT handler to bx_debug_ctrlc_handler
 00000004662i[BIOS  ] $Revision: 13752 $ $Date: 2019-12-30 14:16:18 +0100 (Mon, 30 Dec 2019) $
-00000318050i[KBD   ] reset-disable command received
-00000320827i[BIOS  ] Starting rombios32
-00000321265i[BIOS  ] Shutdown flag 0
-00000321855i[BIOS  ] ram_size=0x02000000
-00000322277i[BIOS  ] ram_end=32MB
-00000362837i[BIOS  ] Found 1 cpu(s)
-00000376489i[BIOS  ] bios_table_addr: 0x000f9db8 end=0x000fcc00
-00000603984i[WINGUI] dimension update x=720 y=400 fontheight=16 fontwidth=9 bpp=8
-00000704310i[PCI   ] i440FX PMC write to PAM register 59 (TLB Flush)
-00001032240i[P2ISA ] PCI IRQ routing: PIRQA# set to 0x0b
-00001032259i[P2ISA ] PCI IRQ routing: PIRQB# set to 0x09
-00001032278i[P2ISA ] PCI IRQ routing: PIRQC# set to 0x0b
-00001032297i[P2ISA ] PCI IRQ routing: PIRQD# set to 0x09
-00001032307i[P2ISA ] write: ELCR2 = 0x0a
-00001033077i[BIOS  ] PIIX3/PIIX4 init: elcr=00 0a
-00001046749i[BIOS  ] PCI: bus=0 devfn=0x00: vendor_id=0x8086 device_id=0x1237 class=0x0600
-00001049062i[BIOS  ] PCI: bus=0 devfn=0x08: vendor_id=0x8086 device_id=0x7000 class=0x0601
-00001051214i[BIOS  ] PCI: bus=0 devfn=0x09: vendor_id=0x8086 device_id=0x7010 class=0x0101
-00001051449i[PIDE  ] BAR #4: i/o base address = 0xc000
-00001052065i[BIOS  ] region 4: 0x0000c000
-00001054107i[BIOS  ] PCI: bus=0 devfn=0x0a: vendor_id=0x8086 device_id=0x7020 class=0x0c03
-00001054320i[UHCI  ] BAR #4: i/o base address = 0xc020
-00001054936i[BIOS  ] region 4: 0x0000c020
-00001055070i[UHCI  ] new IRQ line = 9
-00001056992i[BIOS  ] PCI: bus=0 devfn=0x0b: vendor_id=0x8086 device_id=0x7113 class=0x0680
-00001057236i[ACPI  ] new IRQ line = 11
-00001057250i[ACPI  ] new IRQ line = 9
-00001057277i[ACPI  ] new PM base address: 0xb000
-00001057291i[ACPI  ] new SM base address: 0xb100
-00001057319i[PCI   ] setting SMRAM control register to 0x4a
-00001221412i[CPU0  ] Enter to System Management Mode
-00001221412i[CPU0  ] enter_system_management_mode: temporary disable VMX while in SMM mode
-00001221422i[CPU0  ] RSM: Resuming from System Management Mode
-00001385443i[PCI   ] setting SMRAM control register to 0x0a
-00001412159i[BIOS  ] MP table addr=0x000f9e90 MPC table addr=0x000f9dc0 size=0xc8
-00001414030i[BIOS  ] SMBIOS table addr=0x000f9ea0
-00001416216i[BIOS  ] ACPI tables: RSDP addr=0x000f9fd0 ACPI DATA addr=0x01ff0000 size=0xff8
-00001419463i[BIOS  ] Firmware waking vector 0x1ff00cc
-00001421943i[PCI   ] i440FX PMC write to PAM register 59 (TLB Flush)
-00001422666i[BIOS  ] bios_table_cur_addr: 0x000f9ff4
-00001551537i[VBIOS ] VGABios $Id: vgabios.c 226 2020-01-02 21:36:23Z vruppert $
-00001551608i[BXVGA ] VBE known Display Interface b0c0
-00001551640i[BXVGA ] VBE known Display Interface b0c5
-00001554283i[VBIOS ] VBE Bios $Id: vbe.c 228 2020-01-02 23:09:02Z vruppert $
-00002094279i[BIOS  ] Booting from 0000:7c00
-00230317681i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230317694i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230317698i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230317995i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230317996i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230317997i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318002i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318007i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318008i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318009i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318016i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318017i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318018i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318019i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318020i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318021i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318022i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318023i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318038i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318039i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318040i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318041i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318042i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318043i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318044i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318045i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318056i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318057i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318058i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318059i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318060i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318061i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318062i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318063i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318067i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318068i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318069i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318070i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318071i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318072i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318073i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318074i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318085i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318086i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318087i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318088i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318089i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318090i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318091i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318092i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318096i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318097i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318098i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318099i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318100i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318101i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318102i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318103i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318114i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318115i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318116i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318117i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318118i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318119i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318120i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318121i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318125i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318126i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318127i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318128i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318129i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318130i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318131i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318132i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318143i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318144i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318145i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318146i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318147i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318148i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318149i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00230318150i[CPU0  ] math_abort: MSDOS compatibility FPU exception
-00242623768i[      ] dbg: Quit
-00242623768i[CPU0  ] CPU is in real mode (active)
-00242623768i[CPU0  ] CS.mode = 16 bit
-00242623768i[CPU0  ] SS.mode = 16 bit
-00242623768i[CPU0  ] EFER   = 0x00000000
-00242623768i[CPU0  ] | EAX=00000800  EBX=00000007  ECX=00000001  EDX=00000005
-00242623768i[CPU0  ] | ESP=0000fe66  EBP=0000fea2  ESI=000e0000  EDI=0000070c
-00242623768i[CPU0  ] | IOPL=0 id vip vif ac vm rf nt of df if tf sf zf af pf cf
-00242623768i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
-00242623768i[CPU0  ] |  CS:0800( 0004| 0|  0) 00008000 0000ffff 0 0
-00242623768i[CPU0  ] |  DS:0800( 0005| 0|  0) 00008000 0000ffff 0 0
-00242623768i[CPU0  ] |  SS:0800( 0005| 0|  0) 00008000 0000ffff 0 0
-00242623768i[CPU0  ] |  ES:0800( 0005| 0|  0) 00008000 0000ffff 0 0
-00242623768i[CPU0  ] |  FS:0000( 0005| 0|  0) 00000000 0000ffff 0 0
-00242623768i[CPU0  ] |  GS:0000( 0005| 0|  0) 00000000 0000ffff 0 0
-00242623768i[CPU0  ] | EIP=0000016c (0000016c)
-00242623768i[CPU0  ] | CR0=0x60000010 CR2=0x00000000
-00242623768i[CPU0  ] | CR3=0x00000000 CR4=0x00000000
-00242623768i[CMOS  ] Last time is 1590504150 (Tue May 26 22:42:30 2020)
-00242623768i[SIM   ] quit_sim called with exit code 0
+00000319068i[KBD   ] reset-disable command received
+00000321807i[BIOS  ] Starting rombios32
+00000322245i[BIOS  ] Shutdown flag 0
+00000322835i[BIOS  ] ram_size=0x02000000
+00000323257i[BIOS  ] ram_end=32MB
+00000363799i[BIOS  ] Found 1 cpu(s)
+00000377451i[BIOS  ] bios_table_addr: 0x000f9db8 end=0x000fcc00
+00000603832i[WINGUI] dimension update x=720 y=400 fontheight=16 fontwidth=9 bpp=8
+00000705272i[PCI   ] i440FX PMC write to PAM register 59 (TLB Flush)
+00001033202i[P2ISA ] PCI IRQ routing: PIRQA# set to 0x0b
+00001033221i[P2ISA ] PCI IRQ routing: PIRQB# set to 0x09
+00001033240i[P2ISA ] PCI IRQ routing: PIRQC# set to 0x0b
+00001033259i[P2ISA ] PCI IRQ routing: PIRQD# set to 0x09
+00001033269i[P2ISA ] write: ELCR2 = 0x0a
+00001034039i[BIOS  ] PIIX3/PIIX4 init: elcr=00 0a
+00001047711i[BIOS  ] PCI: bus=0 devfn=0x00: vendor_id=0x8086 device_id=0x1237 class=0x0600
+00001050024i[BIOS  ] PCI: bus=0 devfn=0x08: vendor_id=0x8086 device_id=0x7000 class=0x0601
+00001052176i[BIOS  ] PCI: bus=0 devfn=0x09: vendor_id=0x8086 device_id=0x7010 class=0x0101
+00001052411i[PIDE  ] BAR #4: i/o base address = 0xc000
+00001053027i[BIOS  ] region 4: 0x0000c000
+00001055069i[BIOS  ] PCI: bus=0 devfn=0x0a: vendor_id=0x8086 device_id=0x7020 class=0x0c03
+00001055282i[UHCI  ] BAR #4: i/o base address = 0xc020
+00001055898i[BIOS  ] region 4: 0x0000c020
+00001056032i[UHCI  ] new IRQ line = 9
+00001057954i[BIOS  ] PCI: bus=0 devfn=0x0b: vendor_id=0x8086 device_id=0x7113 class=0x0680
+00001058198i[ACPI  ] new IRQ line = 11
+00001058212i[ACPI  ] new IRQ line = 9
+00001058239i[ACPI  ] new PM base address: 0xb000
+00001058253i[ACPI  ] new SM base address: 0xb100
+00001058281i[PCI   ] setting SMRAM control register to 0x4a
+00001222374i[CPU0  ] Enter to System Management Mode
+00001222374i[CPU0  ] enter_system_management_mode: temporary disable VMX while in SMM mode
+00001222384i[CPU0  ] RSM: Resuming from System Management Mode
+00001386405i[PCI   ] setting SMRAM control register to 0x0a
+00001413121i[BIOS  ] MP table addr=0x000f9e90 MPC table addr=0x000f9dc0 size=0xc8
+00001414992i[BIOS  ] SMBIOS table addr=0x000f9ea0
+00001417178i[BIOS  ] ACPI tables: RSDP addr=0x000f9fd0 ACPI DATA addr=0x01ff0000 size=0xff8
+00001420425i[BIOS  ] Firmware waking vector 0x1ff00cc
+00001422905i[PCI   ] i440FX PMC write to PAM register 59 (TLB Flush)
+00001423628i[BIOS  ] bios_table_cur_addr: 0x000f9ff4
+00001552499i[VBIOS ] VGABios $Id: vgabios.c 226 2020-01-02 21:36:23Z vruppert $
+00001552570i[BXVGA ] VBE known Display Interface b0c0
+00001552602i[BXVGA ] VBE known Display Interface b0c5
+00001555245i[VBIOS ] VBE Bios $Id: vbe.c 228 2020-01-02 23:09:02Z vruppert $
+00002095241i[BIOS  ] Booting from 0000:7c00
+00274282086i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282113i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282114i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282137i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282138i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282192i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282193i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282216i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282217i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282238i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282241i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282243i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282244i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282253i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282257i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282554i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282555i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282556i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282561i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282566i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282567i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282568i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282620i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282621i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282622i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282623i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282624i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282625i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282626i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282627i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282642i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282643i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282644i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282645i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282646i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282647i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282648i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282649i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282660i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282661i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282662i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282663i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282664i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282665i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282666i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282667i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282671i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282672i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282673i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282674i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282675i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282676i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282677i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282678i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282689i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282690i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282691i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282692i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282693i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282694i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282695i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282696i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282700i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282701i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282702i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282703i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282704i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282705i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282706i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282707i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282718i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282719i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282720i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282721i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282722i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282723i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282724i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282725i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282729i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282730i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282731i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282732i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282733i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282734i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282735i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282736i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282747i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282748i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282749i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282750i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282751i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282752i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282753i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00274282754i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476941840i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476941841i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476941868i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476941869i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476941892i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476941893i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476941907i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476941911i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942208i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942209i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942210i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942215i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942220i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942221i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942222i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942274i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942275i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942276i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942277i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942278i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942279i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942280i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942281i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942296i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942297i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942298i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942299i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942300i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942301i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942302i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942303i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942314i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942315i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942316i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942317i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942318i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942319i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942320i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942321i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942325i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942326i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942327i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942328i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942329i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942330i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942331i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942332i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942343i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942344i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942345i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942346i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942347i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942348i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942349i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942350i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942354i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942355i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942356i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942357i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942358i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942359i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942360i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942361i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942372i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942373i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942374i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942375i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942376i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942377i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942378i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942379i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942383i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942384i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942385i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942386i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942387i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942388i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942389i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942390i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942401i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942402i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942403i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942404i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942405i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942406i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942407i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00476942408i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578181i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578182i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578209i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578210i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578227i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578228i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578229i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578237i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578238i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578239i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578240i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578241i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578262i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578263i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578277i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578281i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578578i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578579i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578580i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578585i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578590i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578591i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578592i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578689i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578690i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578691i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578692i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578693i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578694i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578695i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578696i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578711i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578712i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578713i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578714i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578715i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578716i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578717i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578718i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578729i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578730i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578731i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578732i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578733i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578734i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578735i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578736i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578740i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578741i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578742i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578743i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578744i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578745i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578746i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578747i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578758i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578759i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578760i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578761i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578762i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578763i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578764i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578765i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578769i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578770i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578771i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578772i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578773i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578774i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578775i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578776i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578787i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578788i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578789i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578790i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578791i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578792i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578793i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578794i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578798i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578799i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578800i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578801i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578802i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578803i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578804i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578805i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578816i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578817i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578818i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578819i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578820i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578821i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578822i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00663578823i[CPU0  ] math_abort: MSDOS compatibility FPU exception
+00795648000p[WINGUI] >>PANIC<< POWER button turned off.
+00795648000i[CPU0  ] CPU is in real mode (active)
+00795648000i[CPU0  ] CS.mode = 16 bit
+00795648000i[CPU0  ] SS.mode = 16 bit
+00795648000i[CPU0  ] EFER   = 0x00000000
+00795648000i[CPU0  ] | EAX=00000026  EBX=00000007  ECX=0000136e  EDX=00000000
+00795648000i[CPU0  ] | ESP=0000fe86  EBP=0000feba  ESI=000e0000  EDI=0000070c
+00795648000i[CPU0  ] | IOPL=0 id vip vif ac vm rf nt of df if tf sf ZF af PF cf
+00795648000i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
+00795648000i[CPU0  ] |  CS:f000( 0004| 0|  0) 000f0000 0000ffff 0 0
+00795648000i[CPU0  ] |  DS:0040( 0005| 0|  0) 00000400 0000ffff 0 0
+00795648000i[CPU0  ] |  SS:0800( 0005| 0|  0) 00008000 0000ffff 0 0
+00795648000i[CPU0  ] |  ES:0800( 0005| 0|  0) 00008000 0000ffff 0 0
+00795648000i[CPU0  ] |  FS:0000( 0005| 0|  0) 00000000 0000ffff 0 0
+00795648000i[CPU0  ] |  GS:0000( 0005| 0|  0) 00000000 0000ffff 0 0
+00795648000i[CPU0  ] | EIP=0000e86a (0000e86a)
+00795648000i[CPU0  ] | CR0=0x60000010 CR2=0x00000000
+00795648000i[CPU0  ] | CR3=0x00000000 CR4=0x00000000
+00795648000i[CMOS  ] Last time is 1592488137 (Thu Jun 18 21:48:57 2020)
+00795648000i[SIM   ] quit_sim called with exit code 1

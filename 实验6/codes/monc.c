@@ -59,6 +59,7 @@ extern void _callf();
 extern void _display(char ch, int x, int y, int color);
 extern void _get_time();
 extern unsigned char _time[6];
+extern void _cmd_sync(char *para);
 extern int _clock_hotwheel(int n);
 extern int _clock_time(int n);
 extern int _clock_ouch(int n);
@@ -403,7 +404,7 @@ struct PCB
 };
 struct PCB pcbsp[PCBSPSZ];
 struct node pcbndsp[PCBSPSZ];
-int pcbheader, cur_pcb;
+int pcbheader, cur_pcb = 1;
 int new_pcb(unsigned int cs, int pid, char *pname, int cursor)
 {
     int neo_pcb = new_node(cursor, &pcbheader, pcbndsp);
@@ -413,7 +414,7 @@ int new_pcb(unsigned int cs, int pid, char *pname, int cursor)
         pcbsp[neo_pcb].pregs.bx = 0;
         pcbsp[neo_pcb].pregs.cx = 0;
         pcbsp[neo_pcb].pregs.dx = 0;
-        pcbsp[neo_pcb].pregs.sp = 0xffff;
+        pcbsp[neo_pcb].pregs.sp = 0xfffb;
         pcbsp[neo_pcb].pregs.bp = 0;
         pcbsp[neo_pcb].pregs.si = 0;
         pcbsp[neo_pcb].pregs.di = 0;
@@ -433,6 +434,26 @@ int new_pcb(unsigned int cs, int pid, char *pname, int cursor)
         pcbsp[neo_pcb].pstate = 0;
     }
     return neo_pcb;
+}
+void sync_ret()
+{
+    pcbsp[cur_pcb].pstate = 0;
+    reg_swap(&pcbsp[cur_pcb].pregs, &regs);
+    cur_pcb = pcbndsp[cur_pcb].next;
+    delete_node(pcbndsp[cur_pcb].last, &pcbheader, pcbndsp);
+    if (pcbsp[cur_pcb].pid == 0)
+    {
+        cur_pcb = pcbheader;
+    }
+    if (pcbsp[cur_pcb].pid != 0)
+    {
+        reg_swap(&pcbsp[cur_pcb].pregs, &regs);
+        pcbsp[cur_pcb].pstate = 1;
+    }
+    else
+    {
+        _cls();
+    }
 }
 void cmd_sync(char *para)
 {
@@ -475,6 +496,31 @@ void cmd_sync(char *para)
             }
             break;
         }
+    }
+    cur_pcb = null;
+}
+void schedule()
+{
+    if (cur_pcb == null)
+    {
+        cur_pcb = pcbheader;
+        if (pcbsp[cur_pcb].pid != 0)
+        {
+            reg_swap(&pcbsp[cur_pcb].pregs, &regs);
+            pcbsp[cur_pcb].pstate = 1;
+        }
+    }
+    else if (pcbsp[cur_pcb].pid != 0)
+    {
+        pcbsp[cur_pcb].pstate = 0;
+        reg_swap(&pcbsp[cur_pcb].pregs, &regs);
+        cur_pcb = pcbndsp[cur_pcb].next;
+        if (pcbsp[cur_pcb].pid == 0)
+        {
+            cur_pcb = pcbheader;
+        }
+        reg_swap(&pcbsp[cur_pcb].pregs, &regs);
+        pcbsp[cur_pcb].pstate = 1;
     }
 }
 void cmd_list(char *para)
@@ -701,9 +747,6 @@ void clock()
         display_str(lysp[lyheader].ds, lysp[lyheader].str, lysp[lyheader].x, lysp[lyheader].y, lysp[lyheader].color);
         delete_node(lyheader, &lyheader, lyndsp);
     }
-    reg_swap(&pcbsp[cur_pcb].pregs, &regs);
-    cur_pcb = pcbndsp[cur_pcb].next;
-    reg_swap(&pcbsp[cur_pcb].pregs, &regs);
 }
 void init()
 {
@@ -713,7 +756,7 @@ void init()
     command[1].name = "LIST";
     command[1].fun = cmd_list;
     command[2].name = "SYNC";
-    command[2].fun = cmd_sync;
+    command[2].fun = _cmd_sync;
     cmdsz = 3;
     program[0].name = "LTUP.COM";
     program[0].stt = 32;

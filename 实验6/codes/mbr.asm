@@ -12,7 +12,7 @@ _start:
     mov ax, 0x800
     mov es, ax             ; es:bx
     mov cl, 2              ; 扇区号
-    mov al, 20             ; 扇区数
+    mov al, 23             ; 扇区数
     mov bx, 0x100          ; 偏移地址; 存放数据的内存偏移地址
     mov ah, 2              ; 功能号
     mov dl, 0              ; 驱动器号 ; 软盘为0，硬盘和U盘为80H

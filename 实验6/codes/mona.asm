@@ -2,6 +2,9 @@ BITS 16
 extern main
 extern lyfnheader
 extern new_layfun
+extern sync_ret
+extern cmd_sync
+extern schedule
 extern clock_hotwheel
 extern clock_time
 extern ouch_color
@@ -21,6 +24,7 @@ global _callf
 global _display
 global _get_time
 global _time
+global _cmd_sync
 global _clock_hotwheel
 global _clock_time
 global _clock_ouch
@@ -118,6 +122,20 @@ _load:
     mov ah, 2                 ; 功能号
     mov dl, 0                 ; 驱动器号 ; 软盘为0，硬盘和U盘为80H
     int 13H                   ; 调用读磁盘BIOS的13h功能
+    mov ax, es
+    mov ds, ax
+    mov word [0], 0x20cd
+    mov word [0x2e], 0
+    mov word [0x30], 0
+    mov bx, sp
+    mov sp, 0xffff
+    mov ss, ax
+    push word es
+    push word 0x0
+    mov ax, 0x800
+    mov ds, ax
+    mov ss, ax
+    mov sp, bx
     pop dword ebx
     o32 ret
 _callf:
@@ -125,13 +143,10 @@ _callf:
     push dword ebp
     mov ax, 0x1000
     mov ds, ax
-    mov word [0], 0x20cd
     mov word [0x2e], sp
     mov word [0x30], ss
-    mov sp, 0xffff
+    mov sp, 0xfffb
     mov ss, ax
-    push word 0x1000
-    push word 0x0
     jmp 0x1000:0x100           ; 0xb100
 _after_user_ret:
     pop dword ebp
@@ -181,6 +196,14 @@ _get_time:
     out 0x70, al
     in al, 0x71
     mov byte[_year], al
+    o32 ret
+_cmd_sync:
+    cli
+    mov eax, dword[esp + 4]
+    push dword eax
+    call dword cmd_sync
+    add esp, 4
+    sti
     o32 ret
 _clock_hotwheel:
     mov eax, dword [esp + 4]
@@ -266,6 +289,7 @@ _clock:
     call dword clock
     mov dword[_count], _delay ; 重置计数变量=初值delay
 _clock_end:
+    call dword schedule
     mov al, 20h               ; AL = EOI
     out 20h, al               ; 发送EOI到主8529A
     out 0A0h, al              ; 发送EOI到从8529A
@@ -298,6 +322,10 @@ _ouch_end:
     call dword _restart
     iret                      ; 从中断返回
 _int_20h:
+    mov eax, 0
+    cmp eax, dword[0x2e]
+    jz _int_20h_sync
+_int_20h_normal:
     add sp, 4
     pop word bx
     mov sp, word [0x2e]
@@ -307,6 +335,13 @@ _int_20h:
     push bx
     push 0x800
     push word _after_user_ret
+    iret
+_int_20h_sync:
+    mov ax, cs
+    mov ds, ax
+    mov ss, ax
+    call dword sync_ret
+    call dword _restart
     iret
 _int_21h:
     call dword _save
