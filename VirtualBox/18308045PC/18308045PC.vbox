@@ -6,7 +6,7 @@
 ** Use VBoxManage or the VirtualBox Manager GUI to make changes.
 -->
 <VirtualBox xmlns="http://www.virtualbox.org/" version="1.15-windows">
-  <Machine uuid="{530ad47f-28a7-47a3-b9da-64aefe5d2b78}" name="18308045PC" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-06-30T15:11:29Z">
+  <Machine uuid="{530ad47f-28a7-47a3-b9da-64aefe5d2b78}" name="18308045PC" OSType="DOS" snapshotFolder="Snapshots" lastStateChange="2020-07-10T13:11:26Z">
     <MediaRegistry>
       <HardDisks>
         <HardDisk uuid="{3c85d7c3-5df3-4bb9-a685-5a87a2038101}" location="18308045PC.vdi" format="VDI" type="Normal"/>
@@ -57,13 +57,13 @@
       <AudioAdapter controller="SB16" driver="DirectSound" enabled="true" enabledIn="false"/>
       <Clipboard/>
       <GuestProperties>
-        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1593526814275440700" flags=""/>
+        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="zh_CN" timestamp="1594386658493817300" flags="RDONLYGUEST"/>
       </GuestProperties>
     </Hardware>
     <StorageControllers>
       <StorageController name="Floppy" type="I82078" PortCount="1" useHostIOCache="true" Bootable="true">
         <AttachedDevice type="Floppy" hotpluggable="false" port="0" device="0">
-          <Image uuid="{b7934ae6-a9e7-4139-9dfc-e5afdba684c7}"/>
+          <Image uuid="{d5760bbe-0a90-405d-aac5-911e4f185bfe}"/>
         </AttachedDevice>
       </StorageController>
       <StorageController name="IDE" type="PIIX4" PortCount="2" useHostIOCache="true" Bootable="true">
